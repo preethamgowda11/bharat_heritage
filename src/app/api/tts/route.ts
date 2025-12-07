@@ -1,19 +1,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import * as googleTTS from 'google-tts-api';
-import OpenAI from 'openai';
 import https from 'https';
 import { exec } from 'child_process';
 import path from 'path';
 import util from 'util';
 
 const execPromise = util.promisify(exec);
-
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || '', // Ensure API key is set in .env
-    timeout: 3000, // 3 seconds timeout for fast fallback
-    maxRetries: 2,
-});
 
 // Helper to fetch audio using native https module to bypass Next.js fetch patches
 function fetchAudioWithHttps(url: string): Promise<string> {
@@ -53,39 +46,20 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Missing text or lang' }, { status: 400 });
         }
 
-        // OpenAI TTS for Odia with a fallback
+        // For Odia, directly use the reliable child process script
         if (lang === 'or') {
+            const scriptPath = path.join(process.cwd(), 'src', 'lib', 'fetch-tts.js');
             try {
-                if (!process.env.OPENAI_API_KEY) {
-                    throw new Error("OpenAI API key is missing, attempting fallback.");
-                }
-                const audio = await openai.audio.speech.create({
-                    model: "tts-1",
-                    voice: "alloy",
-                    input: text,
-                    response_format: "mp3"
-                });
-                const buffer = Buffer.from(await audio.arrayBuffer());
-                const base64 = buffer.toString("base64");
+                const { stdout, stderr } = await execPromise(`node "${scriptPath}" "${text}" "or"`);
+                if (stderr) console.error("Child process stderr:", stderr);
+                const base64 = stdout.trim();
+                if (!base64) throw new Error("No output from TTS script");
                 return NextResponse.json({
                     results: [{ url: `data:audio/mp3;base64,${base64}`, shortText: text }]
                 });
-            } catch (openaiError: any) {
-                console.error("OpenAI TTS Error:", openaiError.message);
-                // Fallback to Google TTS via child process for Odia
-                const scriptPath = path.join(process.cwd(), 'src', 'lib', 'fetch-tts.js');
-                try {
-                    const { stdout, stderr } = await execPromise(`node "${scriptPath}" "${text}" "or"`);
-                    if (stderr) console.error("Child process stderr:", stderr);
-                    const base64 = stdout.trim();
-                    if (!base64) throw new Error("No output from TTS script");
-                    return NextResponse.json({
-                        results: [{ url: `data:audio/mp3;base64,${base64}`, shortText: text }]
-                    });
-                } catch (childError: any) {
-                    console.error("Fallback TTS Error:", childError.message);
-                    throw new Error(`Fallback TTS failed: ${childError.message}`);
-                }
+            } catch (childError: any) {
+                console.error("Fallback TTS Error:", childError.message);
+                throw new Error(`Fallback TTS failed: ${childError.message}`);
             }
         }
 
