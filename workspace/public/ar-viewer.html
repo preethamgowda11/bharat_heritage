@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Heritage Lens — AR Viewer</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <style>
+      html, body { height:100%; margin:0; background: #000; color: #fff; font-family: system-ui, Roboto, Arial; }
+      #root { width:100%; height:100%; position:relative; }
+      model-viewer {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        --poster-color: transparent;
+        --progress-indicator-color: #ffffff;
+      }
+      #overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        pointer-events: none;
+      }
+      #top-bar {
+        display:flex;
+        gap:12px;
+        padding:12px;
+        pointer-events: auto;
+      }
+      #back-button {
+        background: rgba(0,0,0,0.6);
+        border: none;
+        color: #fff;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      #title {
+        background: rgba(0,0,0,0.45);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-weight:600;
+      }
+      #bottom-bar {
+        display:flex;
+        width:100%;
+        justify-content:center;
+        gap:12px;
+        padding:16px;
+        pointer-events: auto;
+      }
+      .btn {
+        background:#ff7a18;
+        color:#fff;
+        padding:10px 16px;
+        border-radius:10px;
+        border: none;
+        cursor: pointer;
+        font-weight:600;
+      }
+      .btn.secondary {
+        background: rgba(255,255,255,0.12);
+      }
+      #status {
+        position:absolute;
+        left:50%;
+        transform:translateX(-50%);
+        top:12%;
+        background: rgba(0,0,0,0.55);
+        padding:8px 12px;
+        border-radius:8px;
+        pointer-events: none;
+      }
+      #caption {
+        position:absolute;
+        bottom: 90px;
+        left: 16px;
+        right: 16px;
+        background: rgba(0,0,0,0.5);
+        padding:10px;
+        border-radius:8px;
+        font-size:14px;
+        line-height:1.3;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <model-viewer id="ar-viewer"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        camera-controls
+        exposure="1"
+        shadow-intensity="0.7"
+        disable-zoom
+        alt="AR model">
+      </model-viewer>
+
+      <div id="overlay">
+        <div id="top-bar">
+          <button id="back-button" title="Back" onclick="history.back()">⟵</button>
+          <div id="title">Loading...</div>
+        </div>
+
+        <div id="status">Initializing AR...</div>
+
+        <div id="caption" hidden></div>
+
+        <div id="bottom-bar">
+          <button id="place-btn" class="btn secondary">Place Model</button>
+          <button id="tts-btn" class="btn">Read Description</button>
+          <button id="reset-btn" class="btn secondary">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- Utility / state ---
+      const viewer = document.getElementById('ar-viewer');
+      const statusEl = document.getElementById('status');
+      const titleEl = document.getElementById('title');
+      const captionEl = document.getElementById('caption');
+      const placeBtn = document.getElementById('place-btn');
+      const ttsBtn = document.getElementById('tts-btn');
+      const resetBtn = document.getElementById('reset-btn');
+
+      let audioEl = null;
+      let audioUrl = null;
+      let isPlaying = false;
+      let placed = false;
+
+      // Read session storage values (SiteDetail should set them before redirect)
+      const modelParam = new URLSearchParams(window.location.search).get('model') || sessionStorage.getItem('ar_model_url');
+      const siteTitle = sessionStorage.getItem('ar_site_title') || 'Heritage Site';
+      const siteDesc = sessionStorage.getItem('ar_site_description') || '';
+      const siteLang = sessionStorage.getItem('ar_site_lang') || 'en';
+
+      titleEl.textContent = siteTitle;
+      captionEl.textContent = siteDesc;
+      captionEl.hidden = !siteDesc;
+
+      if (!modelParam) {
+        statusEl.textContent = 'No model specified. Please launch AR from the app.';
+        placeBtn.disabled = true;
+        ttsBtn.disabled = !siteDesc;
+      } else {
+        // set model and prepare
+        viewer.src = modelParam;
+        statusEl.textContent = 'Model loaded — tap Place Model to start AR';
+        placeBtn.disabled = false;
+        ttsBtn.disabled = !siteDesc;
+      }
+
+      // Place model - activate AR (requires user gesture)
+      placeBtn.addEventListener('click', async () => {
+        try {
+          // Try to start WebXR via model-viewer
+          statusEl.textContent = 'Requesting camera & AR session...';
+          // model-viewer will request camera when activateAR is called
+          await viewer.activateAR();
+          // Some browsers will immediately open AR UI; user must tap to place
+          statusEl.textContent = 'Move device to find a surface; tap to place.';
+        } catch (err) {
+          console.warn('activateAR failed:', err);
+          statusEl.textContent = 'AR is not supported or permission denied on this device.';
+        }
+      });
+
+      // Reset - revert model (model-viewer does not provide remove; reload page)
+      resetBtn.addEventListener('click', () => {
+        // Reset behavior: reload page to clear AR session and reinitialize state
+        location.reload();
+      });
+
+      // TTS integration: call /api/generate-audio (same origin) and play result
+      ttsBtn.addEventListener('click', async () => {
+        if (!siteDesc) return;
+        if (isPlaying) {
+          if (audioEl) {
+            audioEl.pause();
+            isPlaying = false;
+            ttsBtn.textContent = 'Read Description';
+          }
+          return;
+        }
+        ttsBtn.disabled = true;
+        ttsBtn.textContent = 'Generating...';
+        try {
+          // Best-effort cache: use sessionStorage key
+          const cacheKey = 'tts_cache_' + (siteLang + '||' + siteTitle).slice(0,200);
+          const cached = sessionStorage.getItem(cacheKey);
+          if (cached) {
+            playFromUrl(cached);
+            return;
+          }
+
+          const resp = await fetch('/api/generate-audio', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ text: siteDesc, lang: siteLang })
+          });
+
+          if (!resp.ok) {
+            const txt = await resp.text().catch(() => '');
+            console.error('TTS failed', resp.status, txt);
+            statusEl.textContent = 'TTS service failed.';
+            ttsBtn.textContent = 'Error';
+            ttsBtn.disabled = false;
+            return;
+          }
+
+          // Response can be binary audio (audio/mpeg) or JSON with {audio_url: "..."}
+          const contentType = resp.headers.get('Content-Type') || '';
+          if (contentType.includes('application/json')) {
+            const json = await resp.json().catch(()=>null);
+            const remoteUrl = json && (json.audio_url || json.url);
+            if (remoteUrl) {
+              // Use remote URL directly
+              sessionStorage.setItem(cacheKey, remoteUrl);
+              playFromUrl(remoteUrl);
+            } else {
+              statusEl.textContent = 'Unexpected TTS response.';
+              ttsBtn.textContent = 'Error';
+              ttsBtn.disabled = false;
+            }
+          } else {
+            // assume binary audio
+            const ab = await resp.arrayBuffer();
+            const blob = new Blob([ab], { type: 'audio/mpeg' });
+            const url = URL.createObjectURL(blob);
+            sessionStorage.setItem(cacheKey, url);
+            playFromUrl(url);
+          }
+        } catch (err) {
+          console.error('TTS error', err);
+          statusEl.textContent = 'TTS error.';
+          ttsBtn.textContent = 'Error';
+          ttsBtn.disabled = false;
+        }
+      });
+
+      function playFromUrl(url) {
+        if (!audioEl) {
+          audioEl = document.createElement('audio');
+          audioEl.id = '__luvvoice_audio';
+          audioEl.preload = 'auto';
+          audioEl.addEventListener('ended', () => {
+            isPlaying = false;
+            ttsBtn.textContent = 'Read Description';
+            ttsBtn.disabled = false;
+          });
+          audioEl.addEventListener('error', (e) => {
+            console.error('Audio playback error', e);
+            isPlaying = false;
+            ttsBtn.textContent = 'Read Description';
+            ttsBtn.disabled = false;
+          });
+          document.body.appendChild(audioEl);
+        }
+        // Revoke previous URL if it was created object URL (best-effort)
+        if (audioUrl && audioUrl.startsWith('blob:')) {
+          try { URL.revokeObjectURL(audioUrl); } catch (e) {}
+        }
+        audioUrl = url;
+        audioEl.src = url;
+        audioEl.play().then(()=> {
+          isPlaying = true;
+          ttsBtn.textContent = 'Pause Description';
+          ttsBtn.disabled = false;
+        }).catch(err => {
+          console.error('Play failed', err);
+          isPlaying = false;
+          ttsBtn.textContent = 'Read Description';
+          ttsBtn.disabled = false;
+        });
+      }
+
+      // Small UX: hide status after a while
+      setTimeout(()=> { if (statusEl) statusEl.style.opacity = 0.9; }, 1500);
+    </script>
+  </body>
+</html>

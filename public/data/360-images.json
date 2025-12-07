@@ -1,0 +1,15 @@
+
+{
+  "images": [
+    { "slug": "site-1", "file": "TAJ MAHAL.jpg" },
+    { "slug": "site-2", "file": "hampi.jpg" },
+    { "slug": "site-3", "file": "qutub minar.jpg" },
+    { "slug": "site-4", "file": "konark sun temple.jpg" },
+    { "slug": "site-5", "file": "sanchi stupta.jpg" },
+    { "slug": "site-6", "file": "rani ki vav.jpg" },
+    { "slug": "site-7", "file": "charminar.jpg" },
+    { "slug": "site-8", "file": "jagannath_puri.jpg" },
+    { "slug": "site-9", "file": "ellora cave.jpg" },
+    { "slug": "site-10", "file": "sanchi stupta.jpg" }
+  ]
+}

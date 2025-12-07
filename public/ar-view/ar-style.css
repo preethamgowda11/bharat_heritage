@@ -1,0 +1,89 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    background-color: #000;
+}
+
+#ar-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#ar-unsupported {
+    padding: 20px;
+    text-align: center;
+}
+.back-button {
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+#loader, #interaction-prompt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.7);
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+#bottom-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    z-index: 10;
+}
+
+#model-title {
+    font-size: 1.5em;
+    margin: 0 0 10px 0;
+}
+
+#model-description {
+    font-size: 1em;
+    margin: 0 0 15px 0;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#tts-controls button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+#tts-controls button:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* AR Button provided by three.js */
+#ARButton {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    z-index: 100;
+}

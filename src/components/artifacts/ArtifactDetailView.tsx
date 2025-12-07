@@ -1,0 +1,122 @@
+
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { useState } from 'react';
+import type { Artifact } from '@/types';
+import { useUserPreferences } from '@/context/UserPreferencesContext';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Play, Pause, View, ImageIcon } from 'lucide-react';
+import { ModelViewer } from '@/components/common/ModelViewer';
+import { useTranslation } from '@/hooks/use-translation';
+import { useTts } from '@/hooks/use-tts';
+import { BionicReading } from '@/components/common/BionicReading';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+
+interface ArtifactDetailViewProps {
+  artifact: Artifact;
+}
+
+export function ArtifactDetailView({ artifact }: ArtifactDetailViewProps) {
+  const { isLowBandwidth, isAudioOn } = useUserPreferences();
+  const { t, language } = useTranslation();
+  const { speak, stop, isSpeaking } = useTts();
+  const [show3DModel, setShow3DModel] = useState(false);
+
+  const title = artifact.title[language];
+  const description = artifact.description[language];
+  
+  const modelUrl = isLowBandwidth ? null : artifact.modelFileUrl;
+  const image = PlaceHolderImages.find(p => p.id === artifact.imageUrlId);
+
+  const handleReadDescription = () => {
+    if (isSpeaking) {
+      stop();
+    } else {
+      speak(description, language);
+    }
+  };
+
+  const handleToggle3DModel = () => {
+    if (modelUrl) {
+      setShow3DModel(!show3DModel);
+    }
+  };
+  
+  const arUrl = artifact.arLink || `/ar-viewer?model=${encodeURIComponent(modelUrl || '')}`;
+
+  return (
+    <div className="container max-w-4xl mx-auto p-4 md:p-8">
+      <div className="detail-page-controls mb-6 flex justify-between items-center gap-2">
+        <Button asChild variant="outline" size="sm">
+            <Link href="/artifacts"><ArrowLeft className="mr-2 h-4 w-4" />{t('back_to_all_artifacts')}</Link>
+        </Button>
+        <div className="flex items-center gap-2">
+            <Button 
+              id="read-description-btn" 
+              variant="outline" 
+              size="sm" 
+              onClick={handleReadDescription} 
+              aria-label={t('read_description_aloud')}
+              disabled={!isAudioOn}
+            >
+              {isSpeaking ? <Pause className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />}
+              {isSpeaking ? 'Stop' : t('read_description_aloud')}
+            </Button>
+            {(modelUrl || artifact.arLink) && (
+              <Button asChild>
+                <Link href={arUrl} target="_blank" rel="noopener noreferrer">
+                  <View className="mr-2 h-4 w-4" />
+                  {t('launch_ar')}
+                </Link>
+              </Button>
+            )}
+        </div>
+      </div>
+
+      <div className="relative w-full h-96 rounded-lg overflow-hidden mb-8 shadow-lg bg-muted">
+        {show3DModel && modelUrl ? (
+          <ModelViewer src={modelUrl} alt={`3D model of ${title}`} posterId={artifact.imageUrlId} ar={false} />
+        ) : (
+          image && (
+            <Image 
+              src={image.imageUrl} 
+              alt={`Image of ${title}`} 
+              fill 
+              className="object-cover" 
+              data-ai-hint={image.imageHint}
+              priority
+            />
+          )
+        )}
+      </div>
+
+       <div className="text-center my-6">
+        {modelUrl && (
+          <Button variant="outline" onClick={handleToggle3DModel}>
+            {show3DModel ? (
+                <>
+                  <ImageIcon className="mr-2 h-4 w-4" />
+                  Show Image
+                </>
+              ) : (
+                <>
+                  <View className="mr-2 h-4 w-4" />
+                  {t('show_3d_model')}
+                </>
+              )}
+          </Button>
+        )}
+      </div>
+
+      <header className="mb-6 text-center">
+        <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary">{title}</h1>
+      </header>
+      
+      <article className="prose prose-lg max-w-none mx-auto text-foreground/90 mb-6">
+        <BionicReading text={description} as="p" className="detail-description" />
+      </article>
+    </div>
+  );
+}

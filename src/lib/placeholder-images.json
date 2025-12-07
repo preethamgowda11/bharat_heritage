@@ -1,0 +1,214 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-image",
+      "description": "Hero image showing a collage of Indian heritage sites",
+      "imageUrl": "https://images.unsplash.com/photo-1623676632925-bff8c60b4dc8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxJbmRpYW4lMjBoZXJpdGFnZXxlbnwwfHx8fDE3NjM5NzAyOTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "Indian heritage"
+    },
+    {
+      "id": "taj-mahal-thumb",
+      "description": "Thumbnail for Taj Mahal",
+      "imageUrl": "https://images.unsplash.com/photo-1526711657229-e7e080ed7aa1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx0YWolMjBtYWhhbHxlbnwwfHx8fDE3NjM4ODQ2NDF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "taj mahal"
+    },
+    {
+      "id": "taj-mahal-cover",
+      "description": "Cover image for Taj Mahal",
+      "imageUrl": "https://images.unsplash.com/photo-1567255097545-018d2b9c414c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx0YWolMjBtYWhhbCUyMGluZGlhfGVufDB8fHx8MTc2Mzk3MDI5OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "taj mahal india"
+    },
+    {
+      "id": "hampi-thumb",
+      "description": "Thumbnail for Hampi",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Hampi_chariot.jpg/1200px-Hampi_chariot.jpg",
+      "imageHint": "hampi ruins"
+    },
+    {
+      "id": "hampi-cover",
+      "description": "Cover image for Hampi",
+      "imageUrl": "https://hampitourism.co.in/images/places-to-visit/headers/stone-chariot-hampi-tourism-entry-fee-timings-holidays-reviews-header.jpg",
+      "imageHint": "hampi india"
+    },
+    {
+      "id": "qutub-minar-thumb",
+      "description": "Thumbnail for Qutub Minar",
+      "imageUrl": "https://images.unsplash.com/photo-1625771271992-87f4351c8121?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxxdXR1YiUyMG1pbmFyfGVufDB8fHx8MTc2Mzk3MDI5OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "qutub minar"
+    },
+    {
+      "id": "qutub-minar-cover",
+      "description": "Cover image for Qutub Minar",
+      "imageUrl": "https://media.istockphoto.com/id/179542718/photo/qutub-minar.jpg?s=612x612&w=0&k=20&c=dDhfY_APPXg6E3qWcsZKqOwDfBgD_0HhwXZmopSN5k8=",
+      "imageHint": "qutub minar delhi"
+    },
+    {
+      "id": "konark-sun-temple-thumb",
+      "description": "Thumbnail for Konark Sun Temple",
+      "imageUrl": "https://suryainn.in/wp-content/uploads/2023/09/konark-time-table.jpg",
+      "imageHint": "konark temple"
+    },
+    {
+      "id": "konark-sun-temple-cover",
+      "description": "Cover image for Konark Sun Temple",
+      "imageUrl": "https://images.unsplash.com/photo-1677211352662-30e7775c7ce8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxrb25hcmslMjBzdW4lMjB0ZW1wbGV8ZW58MHx8fHwxNzYzOTcwMjk4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "konark sun temple"
+    },
+    {
+      "id": "rani-ki-vav-thumb",
+      "description": "Thumbnail for Rani-ki-Vav",
+      "imageUrl": "https://images.unsplash.com/photo-1677873500159-e3b3a6190184?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxyYW5pLWtpLXZhdiUyMHN0ZXB3ZWxsfGVufDB8fHx8MTc2NDMxNzgyMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "rani-ki-vav stepwell"
+    },
+    {
+      "id": "rani-ki-vav-cover",
+      "description": "Cover image for Rani-ki-Vav",
+      "imageUrl": "https://i0.wp.com/www.mygreedybackpack.com/wp-content/uploads/2017/10/124.jpg?fit=800%2C504",
+      "imageHint": "rani-ki-vav india"
+    },
+    {
+      "id": "charminar-thumb",
+      "description": "Thumbnail for Charminar",
+      "imageUrl": "https://indiatourisminfo.com/wp-content/uploads/2025/07/Charminars-majestic-arches-and-minarets-illuminated-at-dusk-in-Hyderabad-scaled.jpg",
+      "imageHint": "charminar hyderabad"
+    },
+    {
+      "id": "charminar-cover",
+      "description": "Cover image for Charminar",
+      "imageUrl": "https://images.unsplash.com/photo-1576906131787-4921116d8195?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjaGFybWluYXIlMjBtb251bWVudHxlbnwwfHx8fDE3NjQzMTc4MjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "charminar monument"
+    },
+    {
+      "id": "jagannath-puri-thumb",
+      "description": "Thumbnail for Jagannath Puri Temple",
+      "imageUrl": "https://www.orissapost.com/wp-content/uploads/2024/07/Puri-Jagannath-Temple-.jpg",
+      "imageHint": "jagannath temple"
+    },
+    {
+      "id": "jagannath-puri-cover",
+      "description": "Cover image for Jagannath Puri Temple",
+      "imageUrl": "https://dharohar.hargharpuja.com/wp-content/uploads/2024/08/jagannath-temple-1.jpg",
+      "imageHint": "puri temple"
+    },
+    {
+      "id": "ellora-caves-thumb",
+      "description": "Thumbnail for Ellora Caves",
+      "imageUrl": "https://images.unsplash.com/photo-1701430662597-ff86c1cba95a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlbGxvcmElMjBjYXZlc3xlbnwwfHx8fDE3NjQzMTc4MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ellora caves"
+    },
+    {
+      "id": "ellora-caves-cover",
+      "description": "Cover image for Ellora Caves",
+      "imageUrl": "https://aurangabadtourism.in/images/places-to-visit/header/ellora-caves-aurangabad-tourism-entry-fee-timings-holidays-reviews-header.jpg",
+      "imageHint": "ellora caves maharashtra"
+    },
+    {
+      "id": "sanchi-stupa-thumb",
+      "description": "Thumbnail for Sanchi Stupa",
+      "imageUrl": "https://images.unsplash.com/photo-1585744945554-5df801d2b680?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzYW5jaGklMjBzdHVwYXxlbnwwfHx8fDE3NjQzMTc4MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sanchi stupa"
+    },
+    {
+      "id": "sanchi-stupa-cover",
+      "description": "Cover image for Sanchi Stupa",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fd/The_Great_Stupa_at_Sanchi.jpg",
+      "imageHint": "sanchi stupa india"
+    },
+    {
+      "id": "mughal-painting-artifact",
+      "description": "Image of a Mughal Miniature Painting",
+      "imageUrl": "/artifacts/mughal_painting.jpeg",
+      "imageHint": "mughal painting"
+    },
+    {
+      "id": "vijayanagara-coin-artifact",
+      "description": "Image of a Vijayanagara Empire coin",
+      "imageUrl": "/artifacts/vijayanagara_coin.jpeg",
+      "imageHint": "ancient coin"
+    },
+    {
+      "id": "iron-pillar-artifact",
+      "description": "Image of the Iron Pillar of Delhi",
+      "imageUrl": "/artifacts/Iron_Pillar_Inscription.jpeg",
+      "imageHint": "iron pillar"
+    },
+    {
+      "id": "lakshmi-narasimha-artifact",
+      "description": "Image of the Lakshmi Narasimha statue in Hampi",
+      "imageUrl": "/artifacts/Lakshmi_Narasimha_Statue.jpeg",
+      "imageHint": "narasimha statue"
+    },
+    {
+      "id": "harihara-artifact",
+      "description": "Image of a Harihara statue",
+      "imageUrl": "/artifacts/harihara_statue.jpeg",
+      "imageHint": "harihara statue"
+    },
+    {
+      "id": "chhau-mask-artifact",
+      "description": "Image of a Chhau mask",
+      "imageUrl": "/artifacts/chhau_mask.jpeg",
+      "imageHint": "chhau mask"
+    },
+    {
+      "id": "konark-wheel-artifact",
+      "description": "Image of the Konark Sun Temple wheel",
+      "imageUrl": "/artifacts/Konark_Wheel.jpeg",
+      "imageHint": "konark wheel"
+    },
+    {
+      "id": "fallback-360-taj",
+      "description": "360 fallback image for Taj Mahal",
+      "imageUrl": "https://images.unsplash.com/photo-1707405997487-557b33c87a91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHwzNjAlMjBwYW5vcmFtYXxlbnwwfHx8fDE3NjM5NzAyOTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "360 panorama"
+    },
+    {
+      "id": "fallback-360-hampi",
+      "description": "360 fallback image for Hampi",
+      "imageUrl": "https://images.unsplash.com/photo-1533002832-1721d16b4bb9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHwzNjAlMjBwYW5vcmFtYXxlbnwwfHx8fDE3NjM5NzAyOTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "360 panorama"
+    },
+    {
+      "id": "fallback-360-qutub",
+      "description": "360 fallback image for Qutub Minar",
+      "imageUrl": "https://images.unsplash.com/photo-1707405939120-77f2e1748907?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHwzNjAlMjBwYW5vcmFtYXxlbnwwfHx8fDE3NjM5NzAyOTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "360 panorama"
+    },
+    {
+      "id": "fallback-360-konark",
+      "description": "360 fallback image for Konark Sun Temple",
+      "imageUrl": "https://images.unsplash.com/photo-1707405878166-4874972e0796?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHwzNjAlMjBwYW5vcmFtYXxlbnwwfHx8fDE3NjM5NzAyOTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "360 panorama"
+    },
+    {
+      "id": "fallback-360-rani-ki-vav",
+      "description": "360 fallback image for Rani-ki-Vav",
+      "imageUrl": "https://images.unsplash.com/photo-17074_5997487-557b33c87a91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHwzNjAlMjBwYW5vcmFtYXxlbnwwfHx8fDE3NjQzMTc4MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "360 panorama"
+    },
+    {
+      "id": "fallback-360-charminar",
+      "description": "360 fallback image for Charminar",
+      "imageUrl": "https://images.unsplash.com/photo-1530258614483-0185dc8d6632?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHwzNjAlMjBwYW5vcmFtYXxlbnwwfHx8fDE3NjQzMTc4MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "360 panorama"
+    },
+    {
+      "id": "fallback-360-jagannath-puri",
+      "description": "360 fallback image for Jagannath Puri Temple",
+      "imageUrl": "https://images.unsplash.com/photo-1707405939120-77f2e1748907?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHwzNjAlMjBwYW5vcmFtYXxlbnwwfHx8fDE3NjQzMTc4MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "360 panorama"
+    },
+    {
+      "id": "fallback-360-ellora-caves",
+      "description": "360 fallback image for Ellora Caves",
+      "imageUrl": "https://images.unsplash.com/photo-1707405810598-c5226de2b527?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8MzYwJTIwcGFub3JhbWF8ZW58MHx8fHwxNzY0MzE3ODIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "360 panorama"
+    },
+    {
+      "id": "fallback-360-sanchi-stupa",
+      "description": "360 fallback image for Sanchi Stupa",
+      "imageUrl": "https://images.unsplash.com/photo-1530258614483-0185dc8d6632?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHwzNjAlMjBwYW5vcmFtYXxlbnwwfHx8fDE3NjQzMTc4MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "360 panorama"
+    }
+  ]
+}

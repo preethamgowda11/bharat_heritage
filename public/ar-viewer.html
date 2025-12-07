@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AR Camera Viewer - Bharat Heritage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+    }
+    #camera-feed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+    #ui-controls {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .ar-button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+    .ar-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+
+<body>
+
+  <video id="camera-feed" autoplay playsinline muted></video>
+  
+  <div id="ui-controls">
+    <button id="start-camera" class="ar-button">Start Camera</button>
+    <button id="toggle-bw" class="ar-button" disabled>B/W</button>
+  </div>
+
+  <a-scene embedded vr-mode-ui="enabled: false" renderer="alpha: true; antialias: true;">
+    <a-entity
+      id="model-entity"
+      gltf-model="/models/stone_chariot_in_hampi.glb"
+      position="0 1 -2"
+      scale="1 1 1"
+      rotation="0 0 0"
+    ></a-entity>
+    
+    <a-camera position="0 1.6 0" wasd-controls-enabled="false"></a-camera>
+  </a-scene>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cameraFeed = document.getElementById('camera-feed');
+      const startButton = document.getElementById('start-camera');
+      const toggleButton = document.getElementById('toggle-bw');
+      const modelEntity = document.getElementById('model-entity');
+
+      let isGrayscale = false;
+      let modelReady = false;
+
+      modelEntity.addEventListener('model-loaded', () => {
+        modelReady = true;
+        toggleButton.disabled = false;
+      });
+
+      startButton.addEventListener('click', async () => {
+        startButton.textContent = 'Starting...';
+        startButton.disabled = true;
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' }
+          });
+          cameraFeed.srcObject = stream;
+          await cameraFeed.play();
+          startButton.style.display = 'none';
+        } catch (err) {
+          console.error('Camera access failed:', err);
+          alert('Could not access camera. Please ensure permissions are granted.');
+          // Fallback to user-facing camera if environment fails
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            cameraFeed.srcObject = stream;
+            await cameraFeed.play();
+            startButton.style.display = 'none';
+          } catch (fallbackErr) {
+            console.error('Fallback camera access failed:', fallbackErr);
+            alert('No available camera found.');
+            startButton.textContent = 'Start Camera';
+            startButton.disabled = false;
+          }
+        }
+      });
+      
+      const setModelGrayscale = (enable) => {
+        const mesh = modelEntity.getObject3D('mesh');
+        if (!mesh) return;
+
+        mesh.traverse((node) => {
+          if (node.isMesh && node.material) {
+            const materials = Array.isArray(node.material) ? node.material : [node.material];
+            materials.forEach(material => {
+              if (!material.userData.original) {
+                material.userData.original = {
+                  map: material.map,
+                  color: material.color.clone()
+                };
+              }
+              if (enable) {
+                material.map = null;
+                material.color.set('gray');
+              } else {
+                material.map = material.userData.original.map;
+                material.color.copy(material.userData.original.color);
+              }
+              material.needsUpdate = true;
+            });
+          }
+        });
+      };
+
+      toggleButton.addEventListener('click', () => {
+        if (!modelReady) return;
+        isGrayscale = !isGrayscale;
+        setModelGrayscale(isGrayscale);
+        toggleButton.textContent = isGrayscale ? 'Color' : 'B/W';
+      });
+    });
+  </script>
+</body>
+</html>

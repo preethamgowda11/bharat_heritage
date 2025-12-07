@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 56% 91%; /* #F5F5DC */
+    --foreground: 240 10% 3.9%;
+
+    --card: 60 33% 96%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 60 33% 96%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 36 100% 60%; /* #FF9933 */
+    --primary-foreground: 36 100% 10%;
+
+    --secondary: 60 20% 80%;
+    --secondary-foreground: 240 10% 3.9%;
+
+    --muted: 60 20% 85%;
+    --muted-foreground: 240 5% 45%;
+
+    --accent: 195 100% 50%; /* #00BFFF */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 60 20% 75%;
+    --input: 60 20% 80%;
+    --ring: 36 100% 60%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 36 100% 60%;
+    --chart-2: 195 100% 50%;
+    --chart-3: 210 10% 23%;
+    --chart-4: 60 56% 70%;
+    --chart-5: 30 90% 65%;
+
+    --sidebar-background: 60 40% 93%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 36 100% 60%;
+    --sidebar-primary-foreground: 36 100% 10%;
+    --sidebar-accent: 60 56% 88%;
+    --sidebar-accent-foreground: 36 100% 10%;
+    --sidebar-border: 60 20% 75%;
+    --sidebar-ring: 36 100% 60%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 36 100% 60%;
+    --primary-foreground: 36 100% 10%;
+    
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 195 100% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 36 100% 60%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 36 100% 60%;
+    --sidebar-primary-foreground: 36 100% 10%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 36 100% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  .dyslexia-font {
+    font-family: 'OpenDyslexic', 'PT Sans', sans-serif !important;
+  }
+
+  /* Large Tap Areas */
+  .large-tap-areas button,
+  .large-tap-areas .button,
+  .large-tap-areas [role="button"] {
+    @apply min-h-[48px] min-w-[48px] p-4;
+  }
+}
