@@ -13,13 +13,14 @@ export default function QRScanner({ onResult, onError }: { onResult: (text: stri
   useEffect(() => {
     let rafId: number | null = null;
     let stream: MediaStream | null = null;
+    const videoElement = videoRef.current;
 
     const start = async () => {
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
+        if (videoElement) {
+          videoElement.srcObject = stream;
+          await videoElement.play();
         }
 
         const canvas = canvasRef.current;
@@ -27,13 +28,13 @@ export default function QRScanner({ onResult, onError }: { onResult: (text: stri
 
         const tick = () => {
           if (!scanning) return;
-          if (!videoRef.current || !ctx || !canvas || !overlayRef.current) {
+          if (!videoElement || !ctx || !canvas || !overlayRef.current) {
             rafId = requestAnimationFrame(tick);
             return;
           }
 
-          const vw = videoRef.current.videoWidth;
-          const vh = videoRef.current.videoHeight;
+          const vw = videoElement.videoWidth;
+          const vh = videoElement.videoHeight;
           if (vw === 0 || vh === 0) {
             rafId = requestAnimationFrame(tick);
             return;
@@ -50,7 +51,7 @@ export default function QRScanner({ onResult, onError }: { onResult: (text: stri
 
           // draw the video region for scan into the small canvas (faster)
           try {
-            ctx.drawImage(videoRef.current, sx, sy, size, size, 0, 0, size, size);
+            ctx.drawImage(videoElement, sx, sy, size, size, 0, 0, size, size);
             const imageData = ctx.getImageData(0, 0, size, size);
             const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
             if (code && code.data) {
@@ -80,6 +81,10 @@ export default function QRScanner({ onResult, onError }: { onResult: (text: stri
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
+      if (videoElement) {
+        videoElement.pause();
+        videoElement.srcObject = null;
+      }
       if (stream) stream.getTracks().forEach(t => t.stop());
     };
   }, [onResult, onError, scanning]);
