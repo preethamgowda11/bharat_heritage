@@ -36,7 +36,7 @@ function fetchUrl(url) {
         const req = https.get(url, (res) => {
             if (res.statusCode !== 200) {
                 res.resume(); // Consume response data to free up memory
-                return reject(new Error(`Status Code: ${'res.statusCode'}`));
+                return reject(new Error(`Status Code: ${res.statusCode}`));
             }
             const data = [];
             res.on('data', (chunk) => data.push(chunk));
