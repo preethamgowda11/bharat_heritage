@@ -7,12 +7,13 @@ import { useState } from 'react';
 import type { Artifact } from '@/types';
 import { useUserPreferences } from '@/context/UserPreferencesContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Play, Pause, View, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Play, Pause, View, ImageIcon, MessageSquareQuote } from 'lucide-react';
 import { ModelViewer } from '@/components/common/ModelViewer';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTts } from '@/hooks/use-tts';
 import { BionicReading } from '@/components/common/BionicReading';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Separator } from '../ui/separator';
 
 interface ArtifactDetailViewProps {
   artifact: Artifact;
@@ -117,6 +118,19 @@ export function ArtifactDetailView({ artifact }: ArtifactDetailViewProps) {
       <article className="prose prose-lg max-w-none mx-auto text-foreground/90 mb-6">
         <BionicReading text={description} as="p" className="detail-description" />
       </article>
+
+      <Separator className="my-12" />
+
+      <div className="text-center">
+        <h3 className="text-xl font-headline mb-4">Share Your Thoughts</h3>
+        <p className="text-muted-foreground mb-6">Your feedback helps us improve the experience.</p>
+        <Button asChild size="lg">
+          <Link href={`/feedback?item_id=${artifact.id}&item_title=${encodeURIComponent(title)}&item_type=artifact`}>
+            <MessageSquareQuote className="mr-2 h-5 w-5" />
+            Provide Feedback
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }

@@ -8,12 +8,13 @@ import type { Site } from '@/types';
 import { useUserPreferences } from '@/context/UserPreferencesContext';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, View, ImageIcon, Volume2, Play, Pause, XCircle } from 'lucide-react';
+import { ArrowLeft, View, ImageIcon, Volume2, Play, Pause, XCircle, MessageSquareQuote } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTts } from '@/hooks/use-tts';
 import { ModelViewer } from '@/components/common/ModelViewer';
 import { BionicReading } from '@/components/common/BionicReading';
+import { Separator } from '../ui/separator';
 
 interface SiteDetailViewProps {
   site: Site;
@@ -155,6 +156,19 @@ export function SiteDetailView({ site }: SiteDetailViewProps) {
              </div>
         </div>
       )}
+
+      <Separator className="my-12" />
+
+      <div className="text-center">
+        <h3 className="text-xl font-headline mb-4">Share Your Thoughts</h3>
+        <p className="text-muted-foreground mb-6">Your feedback helps us improve the experience.</p>
+        <Button asChild size="lg">
+          <Link href={`/feedback?item_id=${site.id}&item_title=${encodeURIComponent(title)}&item_type=site`}>
+            <MessageSquareQuote className="mr-2 h-5 w-5" />
+            Provide Feedback
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }
