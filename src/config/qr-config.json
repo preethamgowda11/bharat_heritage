@@ -1,0 +1,9 @@
+
+{
+  "openInNewTab": true,
+  "autoAppendGlbIfMissing": true,
+  "whitelistDomains": [
+    "your-site.com",
+    "localhost"
+  ]
+}

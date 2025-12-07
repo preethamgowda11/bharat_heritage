@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Accessibility, Settings } from 'lucide-react';
+import { Accessibility, Settings, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from './Logo';
 import { AccessibilityPanel } from './AccessibilityPanel';
@@ -26,6 +26,11 @@ export function Header() {
             </span>
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-2">
+            <Button asChild variant="ghost" size="icon" aria-label="Scan QR Code">
+                <Link href="/qr-scanner">
+                    <QrCode className="h-5 w-5" />
+                </Link>
+            </Button>
             <Button
               variant="ghost"
               size="icon"
