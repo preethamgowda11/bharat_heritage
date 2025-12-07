@@ -21,6 +21,7 @@ export interface Artifact {
   description: Record<Language, string>;
   imageUrlId: string;
   modelFileUrl: string;
+  lowPolyModelUrl?: string;
   fallbackImageUrlId: string;
   arLink?: string;
 }

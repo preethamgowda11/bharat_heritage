@@ -27,7 +27,7 @@ export function ArtifactDetailView({ artifact }: ArtifactDetailViewProps) {
   const title = artifact.title[language];
   const description = artifact.description[language];
   
-  const modelUrl = isLowBandwidth ? null : artifact.modelFileUrl;
+  const modelUrl = isLowBandwidth ? artifact.lowPolyModelUrl || artifact.modelFileUrl : artifact.modelFileUrl;
   const image = PlaceHolderImages.find(p => p.id === artifact.imageUrlId);
 
   const handleReadDescription = () => {
