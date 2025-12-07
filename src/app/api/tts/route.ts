@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import * as googleTTS from 'google-tts-api';
 import OpenAI from 'openai';
@@ -52,15 +53,14 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Missing text or lang' }, { status: 400 });
         }
 
-        // OpenAI TTS for Odia
+        // OpenAI TTS for Odia with a fallback
         if (lang === 'or') {
             try {
-                // Check if API key is present
                 if (!process.env.OPENAI_API_KEY) {
-                    throw new Error("OpenAI API key is missing");
+                    throw new Error("OpenAI API key is missing, attempting fallback.");
                 }
                 const audio = await openai.audio.speech.create({
-                    model: "tts-1", // Using standard TTS model
+                    model: "tts-1",
                     voice: "alloy",
                     input: text,
                     response_format: "mp3"
@@ -68,85 +68,51 @@ export async function POST(req: NextRequest) {
                 const buffer = Buffer.from(await audio.arrayBuffer());
                 const base64 = buffer.toString("base64");
                 return NextResponse.json({
-                    results: [
-                        {
-                            url: `data:audio/mp3;base64,${base64}`,
-                            shortText: text
-                        }
-                    ]
+                    results: [{ url: `data:audio/mp3;base64,${base64}`, shortText: text }]
                 });
             } catch (openaiError: any) {
-                console.error("OpenAI TTS Error:", openaiError);
-                // Fallback to Google TTS using child process
-                // This bypasses Next.js environment issues
+                console.error("OpenAI TTS Error:", openaiError.message);
+                // Fallback to Google TTS via child process for Odia
                 const scriptPath = path.join(process.cwd(), 'src', 'lib', 'fetch-tts.js');
                 try {
-                    // Google uses 'or' for Odia.
                     const { stdout, stderr } = await execPromise(`node "${scriptPath}" "${text}" "or"`);
-                    if (stderr) {
-                        console.error("Child process stderr:", stderr);
-                    }
+                    if (stderr) console.error("Child process stderr:", stderr);
                     const base64 = stdout.trim();
-                    if (!base64) {
-                        throw new Error("No output from TTS script");
-                    }
+                    if (!base64) throw new Error("No output from TTS script");
                     return NextResponse.json({
-                        results: [
-                            {
-                                url: `data:audio/mp3;base64,${base64}`,
-                                shortText: text
-                            }
-                        ]
+                        results: [{ url: `data:audio/mp3;base64,${base64}`, shortText: text }]
                     });
                 } catch (childError: any) {
-                    console.error("Fallback TTS Error:", childError);
-                    console.error("Script Path:", scriptPath);
-                    console.error("CWD:", process.cwd());
+                    console.error("Fallback TTS Error:", childError.message);
                     throw new Error(`Fallback TTS failed: ${childError.message}`);
                 }
             }
         }
 
-        // Map our app's language codes to Google Translate codes
-        const langMap: Record<string, string> = {
-            'en': 'en',
-            'hi': 'hi',
-            'kn': 'kn',
-            'or': 'or',
-        };
+        // Standard Google TTS for other languages
+        const langMap: Record<string, string> = { 'en': 'en', 'hi': 'hi', 'kn': 'kn' };
         targetLang = langMap[lang] || 'en';
 
-        // Get URLs first to handle text splitting
         const results = googleTTS.getAllAudioUrls(text, {
             lang: targetLang,
             slow: false,
             host: 'https://translate.google.com',
         });
-
-        // Manually construct URLs with client selection
+        
         const audioResults = await Promise.all(results.map(async (r) => {
-            // Use r.shortText (split chunk) to avoid 400 errors for long text
-            // client=webapp is needed for Odia, but tw-ob is more reliable for others (gtx failing for Hindi)
-            const client = targetLang === 'or' ? 'webapp' : 'tw-ob';
-            
-            console.log(`[DEBUG] lang: ${lang}, targetLang: ${targetLang}, client: ${client}`); // Added debug log
-
+            const client = 'tw-ob'; // tw-ob is generally more reliable
             const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(r.shortText)}&tl=${targetLang}&client=${client}`;
-            console.log("Fetching TTS URL:", url); // DEBUG LOG
-            console.log("Short text:", r.shortText); // DEBUG LOG
             try {
                 const dataUri = await fetchAudioWithHttps(url);
-                return {
-                    url: dataUri,
-                    shortText: r.shortText
-                };
+                return { url: dataUri, shortText: r.shortText };
             } catch (error: any) {
-                console.error('Google TTS Fetch Error:', error.message);
+                console.error(`Google TTS Fetch Error for ${lang}:`, error.message);
                 throw new Error(`Failed to fetch audio from ${url}: ${error.message}`);
             }
         }));
 
         return NextResponse.json({ results: audioResults });
+
     } catch (error: any) {
         console.error('TTS API Error Details:', {
             message: error.message,
