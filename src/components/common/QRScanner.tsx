@@ -12,12 +12,13 @@ export default function QRScanner({ onResult, onError }: { onResult: (text: stri
 
   useEffect(() => {
     let rafId: number | null = null;
-    let stream: MediaStream | null = null;
+    let localStream: MediaStream | null = null;
     const videoElement = videoRef.current;
 
     const start = async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        localStream = stream; // Store stream locally for cleanup
         if (videoElement) {
           videoElement.srcObject = stream;
           await videoElement.play();
@@ -29,14 +30,14 @@ export default function QRScanner({ onResult, onError }: { onResult: (text: stri
         const tick = () => {
           if (!scanning) return;
           if (!videoElement || !ctx || !canvas || !overlayRef.current) {
-            rafId = requestAnimationFrame(tick);
+            if (scanning) rafId = requestAnimationFrame(tick);
             return;
           }
 
           const vw = videoElement.videoWidth;
           const vh = videoElement.videoHeight;
           if (vw === 0 || vh === 0) {
-            rafId = requestAnimationFrame(tick);
+            if (scanning) rafId = requestAnimationFrame(tick);
             return;
           }
 
@@ -66,10 +67,10 @@ export default function QRScanner({ onResult, onError }: { onResult: (text: stri
             // ignore read errors
           }
 
-          rafId = requestAnimationFrame(tick);
+          if (scanning) rafId = requestAnimationFrame(tick);
         };
 
-        rafId = requestAnimationFrame(tick);
+        if (scanning) rafId = requestAnimationFrame(tick);
       } catch (err: any) {
         const msg = err?.message || String(err);
         setError(msg);
@@ -79,15 +80,21 @@ export default function QRScanner({ onResult, onError }: { onResult: (text: stri
 
     start();
 
+    // The cleanup function now uses the variables from its own scope
     return () => {
-      if (rafId) cancelAnimationFrame(rafId);
+      setScanning(false);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
       if (videoElement) {
         videoElement.pause();
         videoElement.srcObject = null;
       }
-      if (stream) stream.getTracks().forEach(t => t.stop());
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+      }
     };
-  }, [onResult, onError, scanning]);
+  }, [onResult, onError]);
 
   // overlay is purely visual. It does not block the video; pointerEvents set to none.
   return (
