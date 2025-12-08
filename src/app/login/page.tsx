@@ -24,10 +24,16 @@ export default function LoginPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
-    // If the initial auth check is done and the user is an admin,
-    // they shouldn't be on the login page, so redirect them.
-    if (!isUserLoading && !isAdminLoading && user && isAdmin) {
+    // This effect handles redirection based on the user's auth state and role.
+    // It runs after the component renders and whenever the auth state changes.
+    if (!isUserLoading && !isAdminLoading && user) {
+      if (isAdmin) {
+        // If the user is an admin, they shouldn't be on the login page.
         router.push('/admin/dashboard');
+      } else {
+        // If the user is logged in but not an admin, they also shouldn't be here.
+        router.push('/');
+      }
     }
   }, [user, isUserLoading, isAdmin, isAdminLoading, router]);
 
@@ -45,15 +51,12 @@ export default function LoginPage() {
 
     try {
       await initiateEmailSignIn(auth, email, password);
-      // The `onAuthStateChanged` listener in the `useUser` hook will handle the user state update.
-      // The `useEffect` on this page and the guard on the dashboard page will handle redirection.
+      // The `useEffect` above will handle redirection upon successful sign-in
+      // when the `user` and `isAdmin` states update.
        toast({
           title: 'Success',
           description: 'You have been signed in. Redirecting...',
        });
-       // Force a redirect after successful sign-in attempt.
-       router.push('/admin/dashboard');
-
     } catch (error: any) {
         toast({
             variant: 'destructive',
@@ -73,7 +76,7 @@ export default function LoginPage() {
             title: 'Signed in as Guest',
             description: 'You are now signed in anonymously.',
         });
-        router.push('/');
+        // The useEffect will redirect to '/' after the user state updates.
     } catch (error: any) {
          toast({
             variant: 'destructive',
@@ -85,23 +88,17 @@ export default function LoginPage() {
     }
   };
 
-  // While checking the initial auth state, show a loading indicator.
-  // The useEffect will handle redirection if the user is already logged in and an admin.
-  if (isUserLoading || isAdminLoading) {
+  // While checking the initial auth state, or if a user is already logged in and being redirected,
+  // show a loading indicator.
+  if (isUserLoading || isAdminLoading || user) {
     return (
         <div className="flex h-screen w-full items-center justify-center">
             <p>Loading...</p>
         </div>
     );
   }
-  
-  // If user is logged in but not an admin, they should not be on the login page either.
-  // Redirect them to home. This handles cases where a non-admin navigates here manually.
-  if (user && !isAdmin) {
-      router.push('/');
-      return null;
-  }
 
+  // If we reach this point, the user is not logged in, so we can show the form.
   return (
     <div className="container mx-auto flex items-center justify-center p-4" style={{ height: 'calc(100vh - 4rem)'}}>
       <Card className="w-full max-w-sm">
