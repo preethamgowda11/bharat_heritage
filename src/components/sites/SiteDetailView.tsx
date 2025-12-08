@@ -3,22 +3,19 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Site } from '@/types';
 import { useUserPreferences } from '@/context/UserPreferencesContext';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, View, ImageIcon, Volume2, Play, Pause, XCircle, MessageSquareQuote } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { ArrowLeft, View, ImageIcon, Play, Pause, XCircle, MessageSquareQuote } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTts } from '@/hooks/use-tts';
 import { ModelViewer } from '@/components/common/ModelViewer';
 import { BionicReading } from '@/components/common/BionicReading';
 import { Separator } from '../ui/separator';
 import NearbyPlaces from './NearbyPlaces';
-import { useFirebase } from '@/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 interface SiteDetailViewProps {
   site: Site;
@@ -29,20 +26,6 @@ export function SiteDetailView({ site }: SiteDetailViewProps) {
   const { t, language } = useTranslation();
   const { speak, stop, isSpeaking } = useTts();
   const [show3DModel, setShow3DModel] = useState(false);
-  const { firestore, user } = useFirebase();
-
-  useEffect(() => {
-    if (user && firestore) {
-      const activityRef = collection(firestore, 'user_activities');
-      addDoc(activityRef, {
-        userId: user.uid,
-        action: 'view_site',
-        targetId: site.id,
-        targetType: 'site',
-        timestamp: serverTimestamp(),
-      }).catch(console.error); // Log errors but don't block
-    }
-  }, [site.id, user, firestore]);
 
   const title = site.title[language];
   const longDescription = site.longDescription[language];

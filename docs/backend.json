@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "Site": {
@@ -167,41 +168,10 @@
       "required": [
         "id"
       ]
-    },
-    "UserActivity": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "UserActivity",
-      "type": "object",
-      "description": "Represents a single user activity event.",
-      "properties": {
-        "userId": {
-          "type": "string",
-          "description": "The ID of the user who performed the action."
-        },
-        "action": {
-          "type": "string",
-          "description": "The type of action performed (e.g., 'view_site', 'play_audio')."
-        },
-        "targetId": {
-          "type": "string",
-          "description": "The ID of the item related to the action (e.g., siteId, artifactId)."
-        },
-        "targetType": {
-          "type": "string",
-          "description": "The type of the item (e.g., 'site', 'artifact')."
-        },
-        "timestamp": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The timestamp when the activity occurred."
-        }
-      },
-      "required": ["userId", "action", "targetId", "targetType", "timestamp"]
     }
   },
   "auth": {
     "providers": [
-      "password",
       "anonymous"
     ]
   },
@@ -274,24 +244,8 @@
             }
           ]
         }
-      },
-      {
-        "path": "/user_activities/{activityId}",
-        "definition": {
-          "entityName": "UserActivity",
-          "schema": {
-            "$ref": "#/backend/entities/UserActivity"
-          },
-          "description": "Stores user activity events. Users can create their own events. Admins can read all events.",
-          "params": [
-            {
-              "name": "activityId",
-              "description": "Unique identifier for the activity event."
-            }
-          ]
-        }
       }
     ],
-    "reasoning": "The Firestore structure is designed to optimize for read operations, ensure security, and maintain data consistency. It leverages path-based ownership for user-specific data and denormalization to avoid complex security rules with `get()` calls. The structure adheres to the principle of homogeneous security posture within collections.\n\n1.  **Sites Collection:** Stores the heritage site data. This collection is globally readable. All documents within `/sites` have the same access requirements (public read access).\n2.  **Artifacts Collection:** Stores artifact data. This collection is globally readable. All documents within `/artifacts` have the same access requirements (public read access). The `siteId` field links artifacts to their respective sites.\n3.  **Users Collection:** Contains user-specific data, including user preferences and favorites. Access is restricted to the authenticated user.\n4.  **User Preferences Subcollection:** Stores the user preferences. This uses a hierarchical path, `/users/{userId}/preferences/{preferencesId}`, for exclusive access to the data by the authorized user.\n5. **User Activities Collection**: Logs user interaction events. Users can only create their own activity logs, ensuring they cannot impersonate others. Read access is restricted to admins to protect user privacy.\n\n**Authorization Independence:** The data structure avoids hierarchical authorization dependencies. For example, artifact documents do not require fetching site information to determine access.\n\n**QAPs Support:**\n\n*   **List Operations:** The segregation of data into collections with homogeneous security postures allows for secure list operations. For example, listing sites or artifacts does not require filtering based on authorization.\n\nThis structure facilitates simple and robust security rules by:\n\n*   Using path-based ownership for user data.\n*   Avoiding `get()` calls in security rules by denormalizing data where necessary.\n*   Ensuring that all documents within a collection have the same security requirements."
+    "reasoning": "The Firestore structure is designed to optimize for read operations, ensure security, and maintain data consistency. It leverages path-based ownership for user-specific data and denormalization to avoid complex security rules with `get()` calls. The structure adheres to the principle of homogeneous security posture within collections.\n\n1.  **Sites Collection:** Stores the heritage site data. This collection is globally readable. All documents within `/sites` have the same access requirements (public read access).\n2.  **Artifacts Collection:** Stores artifact data. This collection is globally readable. All documents within `/artifacts` have the same access requirements (public read access). The `siteId` field links artifacts to their respective sites.\n3.  **Users Collection:** Contains user-specific data, including user preferences and favorites. Access is restricted to the authenticated user.\n4.  **User Preferences Subcollection:** Stores the user preferences. This uses a hierarchical path, `/users/{userId}/preferences/{preferencesId}`, for exclusive access to the data by the authorized user.\n\n**Authorization Independence:** The data structure avoids hierarchical authorization dependencies. For example, artifact documents do not require fetching site information to determine access.\n\n**QAPs Support:**\n\n*   **List Operations:** The segregation of data into collections with homogeneous security postures allows for secure list operations. For example, listing sites or artifacts does not require filtering based on authorization.\n\nThis structure facilitates simple and robust security rules by:\n\n*   Using path-based ownership for user data.\n*   Avoiding `get()` calls in security rules by denormalizing data where necessary.\n*   Ensuring that all documents within a collection have the same security requirements."
   }
 }

@@ -2,31 +2,18 @@
 'use client';
 
 import Link from 'next/link';
-import { Accessibility, Settings, LogIn, LogOut } from 'lucide-react';
+import { Accessibility, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from './Logo';
 import { AccessibilityPanel } from './AccessibilityPanel';
 import { SettingsPanel } from './SettingsPanel';
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
-import { useFirebase } from '@/firebase';
-import { signOut } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
 
 export function Header() {
   const [isAccessibilityOpen, setAccessibilityOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const { t } = useTranslation();
-  const { auth, user } = useFirebase();
-  const router = useRouter();
-
-  const handleSignOut = () => {
-    if (auth) {
-      signOut(auth);
-      router.push('/');
-    }
-  };
-
 
   return (
     <>
@@ -55,18 +42,6 @@ export function Header() {
             >
               <Settings className="h-5 w-5" />
             </Button>
-
-            {user ? (
-                <Button variant="ghost" size="icon" aria-label="Sign Out" onClick={handleSignOut}>
-                  <LogOut className="h-5 w-5" />
-                </Button>
-            ) : (
-              <Button asChild variant="ghost" size="icon" aria-label="Sign In">
-                <Link href="/login">
-                  <LogIn className="h-5 w-5" />
-                </Link>
-              </Button>
-            )}
           </div>
         </div>
       </header>
