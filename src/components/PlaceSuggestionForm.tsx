@@ -23,6 +23,7 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
     e?.preventDefault();
     setError('');
     if (!name.trim()) { setError('Please enter name'); return; }
+    if (!address.trim()) { setError('Please enter an address'); return; }
     if (!description.trim()) { setError('Please enter a short description'); return; }
     setLoading(true);
     try {
@@ -32,7 +33,7 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
         siteId: siteId || null,
         name: name.trim(),
         category,
-        address: address.trim() || null,
+        address: address.trim(),
         phone: phone.trim() || null,
         website: website.trim() || null,
         description: description.trim(),
@@ -71,7 +72,7 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
                   <option value="tourist">Tourist Place</option>
                   <option value="offbeat">Offbeat / Local Spot</option>
                 </select>
-                <input value={address} onChange={(e)=>setAddress(e.target.value)} placeholder="Address (optional)" style={{ padding: 8, borderRadius: 6, border: '1px solid #ddd' }} />
+                <input value={address} onChange={(e)=>setAddress(e.target.value)} placeholder="Address (required)" style={{ padding: 8, borderRadius: 6, border: '1px solid #ddd' }} />
                 <input value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder="Phone (optional)" style={{ padding: 8, borderRadius: 6, border: '1px solid #ddd' }} />
                 <input value={website} onChange={(e)=>setWebsite(e.target.value)} placeholder="Website (optional)" style={{ padding: 8, borderRadius: 6, border: '1px solid #ddd' }} />
                 <div></div>
