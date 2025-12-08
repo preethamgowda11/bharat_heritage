@@ -1,24 +1,20 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import * as googleTTS from 'google-tts-api';
 import https from 'https';
-import { exec } from 'child_process';
-import path from 'path';
-import util from 'util';
 import anuvadiniConfig from '../../../config/anuvadini-config.json';
-
-const execPromise = util.promisify(exec);
 
 // Helper to fetch audio using native https module to bypass Next.js fetch patches
 function fetchAudioWithHttps(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
         https.get(url, {
             headers: {
-                'User-Agent': 'curl/7.64.1', // Mimic curl
+                'User-Agent': 'curl/7.64.1', // Mimic curl to avoid blocks
             }
         }, (res) => {
             if (res.statusCode !== 200) {
-                reject(new Error(`Failed to fetch audio: ${res.statusCode} ${res.statusMessage}`));
+                // Consume response data to free up memory
+                res.resume();
+                reject(new Error(`Failed to fetch audio: Status ${res.statusCode}`));
                 return;
             }
             const chunks: Buffer[] = [];
@@ -34,84 +30,57 @@ function fetchAudioWithHttps(url: string): Promise<string> {
     });
 }
 
-async function getAnuvadiniTts(text: string, lang: string) {
-    // This is a placeholder for a real Anuvadini API call.
-    // As the actual API endpoint is not specified, we'll use a reliable fallback.
-    const scriptPath = path.join(process.cwd(), 'src', 'lib', 'fetch-tts.js');
-    try {
-        const { stdout, stderr } = await execPromise(`node "${scriptPath}" "${text}" "${lang}"`);
-        if (stderr) console.error("Anuvadini (fallback) TTS stderr:", stderr);
-        const base64 = stdout.trim();
-        if (!base64) throw new Error("No output from Anuvadini fallback TTS script");
-        return [{ url: `data:audio/mp3;base64,${base64}`, shortText: text }];
-    } catch (childError: any) {
-        console.error("Anuvadini fallback TTS Error:", childError.message);
-        throw new Error(`Anuvadini fallback TTS failed: ${childError.message}`);
+// Function to split text into manageable chunks for TTS APIs
+function splitText(text: string, maxLength: number = 100): string[] {
+    const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+    const chunks: string[] = [];
+    let currentChunk = '';
+
+    for (const sentence of sentences) {
+        if ((currentChunk + sentence).length > maxLength) {
+            if (currentChunk) chunks.push(currentChunk);
+            currentChunk = sentence;
+        } else {
+            currentChunk += sentence;
+        }
     }
+    if (currentChunk) chunks.push(currentChunk);
+
+    return chunks;
 }
 
 
 export async function POST(req: NextRequest) {
-    let targetLang = 'en';
     let text = '';
+    let lang = 'en';
 
     try {
         const body = await req.json();
         text = body.text;
-        const lang = body.lang;
+        lang = body.lang;
 
         if (!text || !lang) {
             return NextResponse.json({ error: 'Missing text or lang' }, { status: 400 });
         }
-
-        const providerMap = anuvadiniConfig.pipeline.find(p => p.step === 'tts_provider_selection')?.params.providers;
-        const provider = providerMap?.[lang as keyof typeof providerMap];
         
-        if (provider === 'ANUVADINI') {
-            const audioResults = await getAnuvadiniTts(text, lang);
-            return NextResponse.json({ results: audioResults });
-        }
-        
-        // --- GOOGLE TTS (default/fallback) ---
+        const chunks = splitText(text);
 
-        // For Odia, directly use the reliable child process script
-        if (lang === 'or') {
-            const scriptPath = path.join(process.cwd(), 'src', 'lib', 'fetch-tts.js');
-            try {
-                const { stdout, stderr } = await execPromise(`node "${scriptPath}" "${text}" "or"`);
-                if (stderr) console.error("Child process stderr:", stderr);
-                const base64 = stdout.trim();
-                if (!base64) throw new Error("No output from TTS script");
-                return NextResponse.json({
-                    results: [{ url: `data:audio/mp3;base64,${base64}`, shortText: text }]
-                });
-            } catch (childError: any) {
-                console.error("Fallback TTS Error:", childError.message);
-                throw new Error(`Fallback TTS failed: ${childError.message}`);
-            }
-        }
-
-        // Standard Google TTS for other languages
-        const langMap: Record<string, string> = { 'en': 'en', 'hi': 'hi', 'kn': 'kn' };
-        targetLang = langMap[lang] || 'en';
-
-        const results = googleTTS.getAllAudioUrls(text, {
-            lang: targetLang,
-            slow: false,
-            host: 'https://translate.google.com',
-        });
-        
-        const audioResults = await Promise.all(results.map(async (r) => {
-            const client = 'tw-ob'; // tw-ob is generally more reliable
-            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(r.shortText)}&tl=${targetLang}&client=${client}`;
-            try {
-                const dataUri = await fetchAudioWithHttps(url);
-                return { url: dataUri, shortText: r.shortText };
-            } catch (error: any) {
-                console.error(`Google TTS Fetch Error for ${lang}:`, error.message);
-                throw new Error(`Failed to fetch audio from ${url}: ${error.message}`);
-            }
-        }));
+        const audioResults = await Promise.all(
+            chunks.map(async (chunk) => {
+                // Consistent client parameter that is known to be reliable
+                const client = 'tw-ob';
+                const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunk)}&tl=${lang}&client=${client}`;
+                
+                try {
+                    const dataUri = await fetchAudioWithHttps(url);
+                    return { url: dataUri, shortText: chunk };
+                } catch (error: any) {
+                    console.error(`Google TTS Fetch Error for lang '${lang}':`, error.message);
+                    // Throw to be caught by the outer catch block
+                    throw new Error(`Failed to fetch audio for chunk: "${chunk.substring(0, 20)}..."`);
+                }
+            })
+        );
 
         return NextResponse.json({ results: audioResults });
 
@@ -119,7 +88,7 @@ export async function POST(req: NextRequest) {
         console.error('TTS API Error Details:', {
             message: error.message,
             stack: error.stack,
-            lang: targetLang,
+            lang: lang,
             textLength: text?.length
         });
 
