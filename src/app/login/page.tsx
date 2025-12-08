@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,12 +10,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import { useAdmin } from '@/hooks/use-admin';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { useAdmin } from '@/hooks/use-admin';
 
 export default function LoginPage() {
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
+  const { isAdmin, isLoading: isAdminLoading } = useAdmin();
   const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
@@ -22,12 +24,11 @@ export default function LoginPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
-    // This effect handles what happens when auth state is resolved.
-    // It's separate from the sign-in action itself.
-    if (!isUserLoading && user) {
+    // If auth state is resolved and user is confirmed admin, redirect from login page.
+    if (!isUserLoading && !isAdminLoading && user && isAdmin) {
         router.push('/admin/dashboard');
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, isAdmin, isAdminLoading, router]);
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,26 +42,44 @@ export default function LoginPage() {
     }
     setIsSigningIn(true);
 
-    const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
-        // We only want to act when the user object becomes available AFTER sign-in.
+    const unsubscribe = onAuthStateChanged(auth, async (loggedInUser) => {
         if (loggedInUser) {
-            toast({
-                title: 'Success',
-                description: 'You have been signed in.',
-            });
-            // The useEffect above will handle the redirection.
-            setIsSigningIn(false);
-            unsubscribe(); // Clean up the listener
+            unsubscribe(); // Clean up the listener immediately
+            try {
+                const idTokenResult = await loggedInUser.getIdTokenResult();
+                const isUserAdmin = idTokenResult.claims.admin === true;
+
+                toast({
+                    title: 'Success',
+                    description: 'You have been signed in.',
+                });
+                
+                if (isUserAdmin) {
+                    router.push('/admin/dashboard');
+                } else {
+                    router.push('/'); // Redirect non-admins to home
+                }
+            } catch (error) {
+                console.error("Error getting user claims:", error);
+                toast({
+                  variant: 'destructive',
+                  title: 'Authentication Error',
+                  description: 'Could not verify user role.',
+                });
+                router.push('/');
+            } finally {
+                setIsSigningIn(false);
+            }
         }
     }, (error) => {
-        // Handle auth errors during the sign-in process
+        // This handles errors during the sign-in process itself
+        unsubscribe(); // Clean up on error
         toast({
             variant: 'destructive',
             title: 'Authentication Failed',
             description: error.message || 'Could not sign in. Please check your credentials.',
         });
         setIsSigningIn(false);
-        unsubscribe(); // Clean up on error too
     });
 
     // Initiate the sign-in. The listener above will catch the result.
@@ -71,22 +90,21 @@ export default function LoginPage() {
     setIsSigningIn(true);
     const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
+            unsubscribe();
             toast({
                 title: 'Signed in as Guest',
                 description: 'You are now signed in anonymously.',
             });
             router.push('/');
             setIsSigningIn(false);
-            unsubscribe();
         }
     });
     initiateAnonymousSignIn(auth);
   };
 
   // While checking the initial auth state, show a loading indicator.
-  // If the user is already logged in, the useEffect will redirect them,
-  // so we can just show a loading screen to prevent the form from flashing.
-  if (isUserLoading || user) {
+  // The useEffect will handle redirection if the user is already logged in and an admin.
+  if (isUserLoading || isAdminLoading || (user && isAdmin)) {
     return (
         <div className="flex h-screen w-full items-center justify-center">
             <p>Loading...</p>

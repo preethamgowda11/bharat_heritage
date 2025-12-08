@@ -14,14 +14,13 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     // If loading is finished and user is not an admin, redirect to login.
-    // Do not redirect while still loading.
+    // This is the primary guard for this route.
     if (!isLoading && !isAdmin) {
       router.replace('/login');
     }
   }, [isAdmin, isLoading, router]);
 
-  // Show a loading skeleton while the admin check is in progress.
-  // This prevents the page from rendering anything else until the check is complete.
+  // Show a loading skeleton ONLY while the admin check is in progress.
   if (isLoading) {
     return (
         <div className="container mx-auto p-4 md:p-8">
@@ -34,8 +33,9 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // If the user is confirmed as an admin, render the dashboard.
-  // The useEffect above will handle redirecting non-admins away.
+  // If the checks are complete and the user IS an admin, render the dashboard.
+  // The useEffect above handles redirecting non-admins, so we can be sure
+  // that if we reach this point, the user is authorized.
   if (isAdmin) {
     return (
         <div className="container mx-auto p-4 md:p-8">
@@ -64,7 +64,7 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // If not loading and not admin, this will be rendered briefly before redirection.
-  // Returning null is cleaner than a flash of other content.
+  // If not loading and not admin, this state is brief before redirection.
+  // Returning null is cleaner than showing any content.
   return null;
 }
