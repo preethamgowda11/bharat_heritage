@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth, useUser, initiateEmailSignIn, initiateAnonymousSignIn } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -21,13 +21,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
 
-  if (isUserLoading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
   
-  if(user) {
-    router.push('/');
-    return null;
+
+  if (isUserLoading || user) {
+    return <div>Loading...</div>;
   }
 
   const handleSignIn = async (e: React.FormEvent) => {
