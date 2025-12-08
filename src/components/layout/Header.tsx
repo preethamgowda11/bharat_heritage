@@ -1,19 +1,46 @@
-
 'use client';
 
 import Link from 'next/link';
-import { Accessibility, Settings } from 'lucide-react';
+import { Accessibility, Settings, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from './Logo';
 import { AccessibilityPanel } from './AccessibilityPanel';
 import { SettingsPanel } from './SettingsPanel';
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
+import { useUser, useAuth } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
+
 
 export function Header() {
   const [isAccessibilityOpen, setAccessibilityOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const { t } = useTranslation();
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: 'Signed Out',
+        description: 'You have been successfully signed out.',
+      });
+      router.push('/');
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Logout Failed',
+        description: 'Could not sign you out. Please try again.',
+      });
+    }
+  };
+
 
   return (
     <>
@@ -26,6 +53,31 @@ export function Header() {
             </span>
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-2">
+            {!isUserLoading && (
+              user ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Logout"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-5 w-5 mr-2" />
+                  Logout
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Admin Login"
+                >
+                  <Link href="/login">
+                    <LogIn className="h-5 w-5 mr-2" />
+                    Admin Login
+                  </Link>
+                </Button>
+              )
+            )}
             <Button
               variant="ghost"
               size="icon"
