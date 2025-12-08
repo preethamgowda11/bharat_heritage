@@ -44,7 +44,7 @@ export default function Home() {
               {t('discover_artifacts')}
             </Link>
           </Button>
-           <Button asChild size="lg" variant="destructive">
+           <Button asChild size="lg" variant="secondary">
             <Link href="/lost-india">
               <ShieldAlert className="mr-2 h-5 w-5" />
               {t('lost_india_title')}
