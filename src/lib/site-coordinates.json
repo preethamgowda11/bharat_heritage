@@ -1,13 +1,14 @@
+
 {
   "siteCoordinates": [
-    { "id": "site-1", "lat": 27.1751, "lon": 78.0421 },
-    { "id": "site-2", "lat": 15.3350, "lon": 76.4600 },
-    { "id": "site-3", "lat": 28.5245, "lon": 77.1855 },
-    { "id": "site-4", "lat": 19.8876, "lon": 86.0945 },
-    { "id": "site-6", "lat": 23.8824, "lon": 72.1384 },
-    { "id": "site-7", "lat": 17.3616, "lon": 78.4747 },
-    { "id": "site-8", "lat": 19.8048, "lon": 85.8181 },
-    { "id": "site-9", "lat": 20.2961, "lon": 75.3444 },
-    { "id": "site-10", "lat": 23.4833, "lon": 77.7333 }
+    { "id": "site-1", "lat": 27.1751, "lon": 78.0421, "state": "Uttar Pradesh" },
+    { "id": "site-2", "lat": 15.3350, "lon": 76.4600, "state": "Karnataka" },
+    { "id": "site-3", "lat": 28.5245, "lon": 77.1855, "state": "Delhi" },
+    { "id": "site-4", "lat": 19.8876, "lon": 86.0945, "state": "Odisha" },
+    { "id": "site-6", "lat": 23.8824, "lon": 72.1384, "state": "Gujarat" },
+    { "id": "site-7", "lat": 17.3616, "lon": 78.4747, "state": "Telangana" },
+    { "id": "site-8", "lat": 19.8048, "lon": 85.8181, "state": "Odisha" },
+    { "id": "site-9", "lat": 20.2961, "lon": 75.3444, "state": "Maharashtra" },
+    { "id": "site-10", "lat": 23.4833, "lon": 77.7333, "state": "Madhya Pradesh" }
   ]
 }

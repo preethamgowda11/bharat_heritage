@@ -1,3 +1,4 @@
+
 export type Language = 'en' | 'hi' | 'kn' | 'or';
 
 export interface Site {
@@ -14,6 +15,7 @@ export interface Site {
   arLink?: string;
   lat?: number;
   lon?: number;
+  state: string;
 }
 
 export interface Artifact {

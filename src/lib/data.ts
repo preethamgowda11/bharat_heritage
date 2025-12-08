@@ -405,6 +405,7 @@ const allSites: Site[] = siteCoordinatesData.siteCoordinates.map(coord => {
     ...siteData,
     lat: coord.lat,
     lon: coord.lon,
+    state: coord.state
   };
 }).filter(Boolean) as Site[];
 
