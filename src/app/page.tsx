@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Landmark, Gem } from 'lucide-react';
+import { Landmark, Gem, QrCode } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -42,6 +42,12 @@ export default function Home() {
             <Link href="/artifacts">
               <Gem className="mr-2 h-5 w-5" />
               {t('discover_artifacts')}
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="outline" className="bg-background/80 text-foreground">
+            <Link href="/ar-sculptures/sample-addon/viewer.html" target="_blank" rel="noopener noreferrer">
+              <QrCode className="mr-2 h-5 w-5" />
+              Scan & Learn
             </Link>
           </Button>
         </div>
