@@ -5,6 +5,7 @@ import https from 'https';
 import { exec } from 'child_process';
 import path from 'path';
 import util from 'util';
+import anuvadiniConfig from '../../../config/anuvadini-config.json';
 
 const execPromise = util.promisify(exec);
 
@@ -33,6 +34,23 @@ function fetchAudioWithHttps(url: string): Promise<string> {
     });
 }
 
+async function getAnuvadiniTts(text: string, lang: string) {
+    // This is a placeholder for a real Anuvadini API call.
+    // As the actual API endpoint is not specified, we'll use a reliable fallback.
+    const scriptPath = path.join(process.cwd(), 'src', 'lib', 'fetch-tts.js');
+    try {
+        const { stdout, stderr } = await execPromise(`node "${scriptPath}" "${text}" "${lang}"`);
+        if (stderr) console.error("Anuvadini (fallback) TTS stderr:", stderr);
+        const base64 = stdout.trim();
+        if (!base64) throw new Error("No output from Anuvadini fallback TTS script");
+        return [{ url: `data:audio/mp3;base64,${base64}`, shortText: text }];
+    } catch (childError: any) {
+        console.error("Anuvadini fallback TTS Error:", childError.message);
+        throw new Error(`Anuvadini fallback TTS failed: ${childError.message}`);
+    }
+}
+
+
 export async function POST(req: NextRequest) {
     let targetLang = 'en';
     let text = '';
@@ -45,6 +63,16 @@ export async function POST(req: NextRequest) {
         if (!text || !lang) {
             return NextResponse.json({ error: 'Missing text or lang' }, { status: 400 });
         }
+
+        const providerMap = anuvadiniConfig.pipeline.find(p => p.step === 'tts_provider_selection')?.params.providers;
+        const provider = providerMap?.[lang as keyof typeof providerMap];
+        
+        if (provider === 'ANUVADINI') {
+            const audioResults = await getAnuvadiniTts(text, lang);
+            return NextResponse.json({ results: audioResults });
+        }
+        
+        // --- GOOGLE TTS (default/fallback) ---
 
         // For Odia, directly use the reliable child process script
         if (lang === 'or') {

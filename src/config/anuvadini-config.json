@@ -1,0 +1,124 @@
+
+{
+  "api_key": "ANUVADINI_API_KEY",
+  "request_id": "req_{{unique_id}}",
+
+  "languages": {
+    "supported": ["en", "hi", "kn", "or"],
+    "default": "en",
+    "priority_order": ["en", "hi", "kn", "or"]
+  },
+
+  "pipeline": [
+    {
+      "step": "ingest",
+      "input": {
+        "type": "image|text",
+        "mime_type": "image/jpeg",
+        "content_source": {
+          "method": "data_url",
+          "data_url": "data:image/jpeg;base64,REPLACE_BASE64_DATA"
+        },
+        "source_lang": "auto",
+        "asset_id": "heritage_object_001"
+      }
+    },
+    {
+      "step": "ocr_translate",
+      "params": {
+        "features": ["ocr"],
+        "target_langs": ["en", "hi", "kn", "or"],
+        "treat_all_languages_equally": true,
+        "default_output_language": "en",
+        "preserve_historic_terms": true
+      }
+    },
+    {
+      "step": "tts_provider_selection",
+      "params": {
+        "providers": {
+          "en": "GOOGLE",
+          "hi": "GOOGLE",
+          "kn": "ANUVADINI",
+          "or": "ANUVADINI"
+        },
+        "fallback_chain": ["ANUVADINI", "GOOGLE"],
+        "max_audio_size_kb": 4096
+      }
+    },
+    {
+      "step": "generate_tts",
+      "params": {
+        "voices": {
+          "en": {"voice_id": "en_male_01"},
+          "hi": {"voice_id": "hi_female_01"},
+          "kn": {"voice_id": "kn_female_01"},
+          "or": {"voice_id": "or_female_01"}
+        },
+        "audio_output": {
+          "format": "mp3",
+          "bitrate_kbps": 128
+        },
+        "on_failure": "skip_audio_but_return_text"
+      }
+    },
+    {
+      "step": "deliver",
+      "params": {
+        "delivery_mode": "inline",
+        "include_text": true,
+        "include_audio": true,
+        "include_ocr_raw": false,
+        "audio_delivery": {
+          "method": "presigned_url",
+          "valid_for_seconds": 86400
+        }
+      }
+    }
+  ],
+
+  "metadata": {
+    "app": "BharatHeritageAR",
+    "module": "AR_Artifact_Descriptions",
+    "site": "Konark Sun Temple",
+    "created_by": "user_12345",
+    "note": "All 4 languages equal. English is default fallback."
+  },
+
+  "error_handling": {
+    "retry_attempts": 3,
+    "backoff_seconds": 5,
+    "on_total_failure": {
+      "return": "raw_ocr_text",
+      "message": "Translation and TTS unavailable."
+    }
+  },
+
+  "response_example": {
+    "status": "completed",
+    "outputs": [
+      {
+        "lang": "en",
+        "text": "Konark Sun Temple...",
+        "audio_url": "https://signed-url.com/tts_en.mp3"
+      },
+      {
+        "lang": "hi",
+        "text": "कोणार्क सूर्य मंदिर...",
+        "audio_url": "https://signed-url.com/tts_hi.mp3"
+      },
+      {
+        "lang": "kn",
+        "text": "ಕೋಣಾರ್ಕ್ ಸೂರ್ಯ ದೇವಾಲಯ...",
+        "audio_url": "https://signed-url.com/tts_kn.mp3"
+      },
+      {
+        "lang": "or",
+        "text": "କୋଣାର୍କ ସୂର୍ୟ ମନ୍ଦିର...",
+        "audio_url": "https://signed-url.com/tts_or.mp3"
+      }
+    ],
+    "default_served_language": "en",
+    "processing_time_ms": 2520
+  }
+}
