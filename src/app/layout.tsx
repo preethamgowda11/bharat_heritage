@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import './globals.css';
 import { LowBandwidthIndicator } from '@/components/common/LowBandwidthIndicator';
+import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'Bharat Heritage',
@@ -45,14 +46,16 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased'
         )}
       >
-        <UserPreferencesProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <LowBandwidthIndicator />
-            <main className="flex-1">{children}</main>
-          </div>
-          <Toaster />
-        </UserPreferencesProvider>
+        <FirebaseClientProvider>
+          <UserPreferencesProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <Header />
+              <LowBandwidthIndicator />
+              <main className="flex-1">{children}</main>
+            </div>
+            <Toaster />
+          </UserPreferencesProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );

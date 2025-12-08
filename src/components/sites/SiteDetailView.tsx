@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Site } from '@/types';
 import { useUserPreferences } from '@/context/UserPreferencesContext';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -16,6 +16,9 @@ import { ModelViewer } from '@/components/common/ModelViewer';
 import { BionicReading } from '@/components/common/BionicReading';
 import { Separator } from '../ui/separator';
 import NearbyPlaces from './NearbyPlaces';
+import { useFirebase } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
 
 interface SiteDetailViewProps {
   site: Site;
@@ -26,6 +29,20 @@ export function SiteDetailView({ site }: SiteDetailViewProps) {
   const { t, language } = useTranslation();
   const { speak, stop, isSpeaking } = useTts();
   const [show3DModel, setShow3DModel] = useState(false);
+  const { firestore, user } = useFirebase();
+
+  useEffect(() => {
+    if (user && firestore) {
+      const activityRef = collection(firestore, 'user_activities');
+      addDoc(activityRef, {
+        userId: user.uid,
+        action: 'view_site',
+        targetId: site.id,
+        targetType: 'site',
+        timestamp: serverTimestamp(),
+      }).catch(console.error); // Log errors but don't block
+    }
+  }, [site.id, user, firestore]);
 
   const title = site.title[language];
   const longDescription = site.longDescription[language];
