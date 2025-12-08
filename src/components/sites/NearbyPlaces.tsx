@@ -6,12 +6,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Building, Hotel, MapPin, Tent, Landmark } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface NearbyPlacesProps {
   lat?: number;
   lon?: number;
   radius?: number;
 }
+
+const INITIAL_DISPLAY_COUNT = 3;
 
 const getIconForTag = (tags: Record<string, string>) => {
     const tourism = tags.tourism;
@@ -70,6 +73,8 @@ export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesPr
   const [hotels, setHotels] = useState<POI[]>([]);
   const [tourist, setTourist] = useState<POI[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAllStays, setShowAllStays] = useState(false);
+  const [showAllTourist, setShowAllTourist] = useState(false);
 
   useEffect(() => {
     if (!lat || !lon) {
@@ -99,6 +104,29 @@ export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesPr
     return () => { mounted = false; };
   }, [lat, lon, radius]);
 
+  const renderPoiList = (
+    pois: POI[], 
+    showAll: boolean, 
+    toggleShowAll: () => void, 
+    type: 'stays' | 'spots'
+    ) => {
+    const visiblePois = showAll ? pois : pois.slice(0, INITIAL_DISPLAY_COUNT);
+    return (
+        <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {visiblePois.map((p) => <PoiCard key={p.id} poi={p} />)}
+            </div>
+            {pois.length > INITIAL_DISPLAY_COUNT && (
+                <div className="text-center mt-6">
+                    <Button variant="outline" onClick={toggleShowAll}>
+                        {showAll ? `See Less ${type}` : `See All ${pois.length} ${type}`}
+                    </Button>
+                </div>
+            )}
+        </>
+    )
+  }
+
   if (!lat || !lon) return null;
 
   return (
@@ -112,18 +140,14 @@ export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesPr
             <TabsContent value="stays">
                 {loading ? <LoadingSkeleton /> : (
                     hotels.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {hotels.map((p) => <PoiCard key={p.id} poi={p} />)}
-                        </div>
+                        renderPoiList(hotels, showAllStays, () => setShowAllStays(prev => !prev), 'stays')
                     ) : <p className="text-center text-muted-foreground mt-8">No nearby stays found within {radius / 1000}km.</p>
                 )}
             </TabsContent>
             <TabsContent value="tourist">
                 {loading ? <LoadingSkeleton /> : (
                     tourist.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {tourist.map((p) => <PoiCard key={p.id} poi={p} />)}
-                        </div>
+                        renderPoiList(tourist, showAllTourist, () => setShowAllTourist(prev => !prev), 'spots')
                     ) : <p className="text-center text-muted-foreground mt-8">No nearby tourist spots found within {radius / 1000}km.</p>
                 )}
             </TabsContent>
