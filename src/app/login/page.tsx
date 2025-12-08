@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { onAuthStateChanged } from 'firebase/auth';
 import { Separator } from '@/components/ui/separator';
+import { useAdmin } from '@/hooks/use-admin';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -21,43 +21,49 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
 
-  // This effect will run ONCE when the component mounts.
-  // If the user is already logged in when they visit this page, redirect them.
   useEffect(() => {
-    if (user) {
-      router.push('/admin/dashboard');
-    }
-  }, [user, router]);
-  
-
-  if (isUserLoading || user) {
-    return <div>Loading...</div>;
-  }
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSigningIn(true);
-    
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if(user) {
-        toast({
-          title: 'Success',
-          description: 'You have been signed in.',
-        });
+    // This effect handles what happens when auth state is resolved.
+    // It's separate from the sign-in action itself.
+    if (!isUserLoading && user) {
         router.push('/admin/dashboard');
-        setIsSigningIn(false);
-        unsubscribe(); // Clean up the listener once we've redirected
-      }
-    }, (error) => {
+    }
+  }, [user, isUserLoading, router]);
+
+  const handleSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
         toast({
-          variant: 'destructive',
-          title: 'Authentication Failed',
-          description: error.message || 'Could not sign in. Please check your credentials.',
+            variant: 'destructive',
+            title: 'Missing Fields',
+            description: 'Please enter both email and password.',
+        });
+        return;
+    }
+    setIsSigningIn(true);
+
+    const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
+        // We only want to act when the user object becomes available AFTER sign-in.
+        if (loggedInUser) {
+            toast({
+                title: 'Success',
+                description: 'You have been signed in.',
+            });
+            // The useEffect above will handle the redirection.
+            setIsSigningIn(false);
+            unsubscribe(); // Clean up the listener
+        }
+    }, (error) => {
+        // Handle auth errors during the sign-in process
+        toast({
+            variant: 'destructive',
+            title: 'Authentication Failed',
+            description: error.message || 'Could not sign in. Please check your credentials.',
         });
         setIsSigningIn(false);
-        unsubscribe(); // Clean up listener on error too
+        unsubscribe(); // Clean up on error too
     });
 
+    // Initiate the sign-in. The listener above will catch the result.
     initiateEmailSignIn(auth, email, password);
   };
   
@@ -76,6 +82,17 @@ export default function LoginPage() {
     });
     initiateAnonymousSignIn(auth);
   };
+
+  // While checking the initial auth state, show a loading indicator.
+  // If the user is already logged in, the useEffect will redirect them,
+  // so we can just show a loading screen to prevent the form from flashing.
+  if (isUserLoading || user) {
+    return (
+        <div className="flex h-screen w-full items-center justify-center">
+            <p>Loading...</p>
+        </div>
+    );
+  }
 
   return (
     <div className="container mx-auto flex items-center justify-center p-4" style={{ height: 'calc(100vh - 4rem)'}}>
