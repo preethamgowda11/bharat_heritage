@@ -8,8 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Building, Hotel, MapPin, Tent, Landmark, Mountain, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import PlaceSuggestionForm from '@/components/PlaceSuggestionForm';
 
 interface NearbyPlacesProps {
+  siteId: string;
   lat?: number;
   lon?: number;
   radius?: number;
@@ -72,7 +74,7 @@ const LoadingSkeleton = () => (
 );
 
 
-export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesProps) {
+export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: NearbyPlacesProps) {
   const [hotels, setHotels] = useState<POI[]>([]);
   const [tourist, setTourist] = useState<POI[]>([]);
   const [offbeat, setOffbeat] = useState<POI[]>([]);
@@ -141,7 +143,10 @@ export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesPr
 
   return (
     <section className="mb-12">
-        <h2 className="text-3xl font-headline text-center mb-8">Nearby Stays & Places</h2>
+        <div className="flex justify-center items-center gap-4 mb-8 text-center">
+            <h2 className="text-3xl font-headline">Nearby Stays & Places</h2>
+            <PlaceSuggestionForm siteId={siteId} lat={lat} lon={lon} />
+        </div>
         <Tabs defaultValue="stays" className="w-full">
             <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3">
                 <TabsTrigger value="stays">Stays</TabsTrigger>
