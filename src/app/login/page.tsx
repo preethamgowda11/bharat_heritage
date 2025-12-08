@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { useUser } from '@/firebase';
 import { useAdmin } from '@/hooks/use-admin';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -24,15 +25,15 @@ export default function LoginPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
-    // This effect handles redirection based on the user's auth state and role.
-    // It runs after the component renders and whenever the auth state changes.
+    // This effect handles redirection for users who are ALREADY logged in
+    // when they land on this page.
     if (!isUserLoading && !isAdminLoading && user) {
       if (isAdmin) {
         // If the user is an admin, they shouldn't be on the login page.
-        router.push('/admin/dashboard');
+        router.replace('/admin/dashboard');
       } else {
-        // If the user is logged in but not an admin, they also shouldn't be here.
-        router.push('/');
+        // If the user is logged in but not an admin, send them to the home page.
+        router.replace('/');
       }
     }
   }, [user, isUserLoading, isAdmin, isAdminLoading, router]);
@@ -51,12 +52,12 @@ export default function LoginPage() {
 
     try {
       await initiateEmailSignIn(auth, email, password);
-      // The `useEffect` above will handle redirection upon successful sign-in
-      // when the `user` and `isAdmin` states update.
-       toast({
+      // After initiating sign-in, the useEffect hook will detect the auth state change
+      // and handle the redirection.
+      toast({
           title: 'Success',
           description: 'You have been signed in. Redirecting...',
-       });
+      });
     } catch (error: any) {
         toast({
             variant: 'destructive',
@@ -89,11 +90,30 @@ export default function LoginPage() {
   };
 
   // While checking the initial auth state, or if a user is already logged in and being redirected,
-  // show a loading indicator.
+  // show a loading skeleton.
   if (isUserLoading || isAdminLoading || user) {
     return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <p>Loading...</p>
+        <div className="container mx-auto flex items-center justify-center p-4" style={{ height: 'calc(100vh - 4rem)'}}>
+            <Card className="w-full max-w-sm">
+                <CardHeader>
+                    <Skeleton className="h-8 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <Skeleton className="h-10 w-full" />
+                </CardContent>
+                <CardFooter>
+                     <Skeleton className="h-10 w-full" />
+                </CardFooter>
+            </Card>
         </div>
     );
   }

@@ -13,14 +13,15 @@ export default function AdminDashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // If loading is finished and user is not an admin, redirect to login.
     // This is the primary guard for this route.
+    // Wait until the loading is complete before making a decision.
     if (!isLoading && !isAdmin) {
+      // If the check is done and the user is NOT an admin, redirect to login.
       router.replace('/login');
     }
   }, [isAdmin, isLoading, router]);
 
-  // Show a loading skeleton ONLY while the admin check is in progress.
+  // While the admin check is in progress, show a loading skeleton.
   if (isLoading) {
     return (
         <div className="container mx-auto p-4 md:p-8">
@@ -65,6 +66,6 @@ export default function AdminDashboardPage() {
   }
 
   // If not loading and not admin, this state is brief before redirection.
-  // Returning null is cleaner than showing any content.
+  // Returning null is cleaner than showing any temporary content.
   return null;
 }
