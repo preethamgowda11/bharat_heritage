@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth, initiateEmailSignIn, initiateAnonymousSignIn } from '@/firebase';
+import { initiateEmailSignIn, initiateAnonymousSignIn, useAuth, useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -10,9 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import { useUser } from '@/firebase';
 import { useAdmin } from '@/hooks/use-admin';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getRedirectResult, signInWithRedirect } from 'firebase/auth';
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -26,10 +26,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     // This effect handles redirection for users who are ALREADY logged in
-    // when they land on this page.
+    // when they land on this page. It waits until all auth checks are complete.
     if (!isUserLoading && !isAdminLoading && user) {
       if (isAdmin) {
-        // If the user is an admin, they shouldn't be on the login page.
+        // If the user is a verified admin, they shouldn't be on the login page.
         router.replace('/admin/dashboard');
       } else {
         // If the user is logged in but not an admin, send them to the home page.
@@ -51,13 +51,19 @@ export default function LoginPage() {
     setIsSigningIn(true);
 
     try {
+      // Use the non-blocking sign-in. The auth state change will be picked up
+      // by the hooks, and the useEffect will handle the redirect.
       await initiateEmailSignIn(auth, email, password);
-      // After initiating sign-in, the useEffect hook will detect the auth state change
-      // and handle the redirection.
+      
       toast({
           title: 'Success',
-          description: 'You have been signed in. Redirecting...',
+          description: "You've been signed in. Redirecting to the dashboard...",
       });
+
+      // Directly navigate to the dashboard after a successful login attempt.
+      // The guard on the dashboard page will handle non-admins.
+      router.push('/admin/dashboard');
+      
     } catch (error: any) {
         toast({
             variant: 'destructive',
@@ -77,7 +83,7 @@ export default function LoginPage() {
             title: 'Signed in as Guest',
             description: 'You are now signed in anonymously.',
         });
-        // The useEffect will redirect to '/' after the user state updates.
+        router.push('/');
     } catch (error: any) {
          toast({
             variant: 'destructive',
