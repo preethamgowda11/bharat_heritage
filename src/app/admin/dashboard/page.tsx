@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useAdmin } from '@/hooks/use-admin';
 import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -11,7 +12,17 @@ export default function AdminDashboardPage() {
   const { isAdmin, isLoading } = useAdmin();
   const router = useRouter();
 
-  if (isLoading) {
+  useEffect(() => {
+    // This effect runs after rendering.
+    // If loading is finished and the user is not an admin, then we redirect.
+    if (!isLoading && !isAdmin) {
+      router.push('/login');
+    }
+  }, [isLoading, isAdmin, router]);
+
+  // While loading, or if the user is not an admin yet (and the redirect hasn't happened),
+  // show the loading skeleton. This prevents showing the dashboard to non-admins.
+  if (isLoading || !isAdmin) {
     return (
       <div className="container px-4 md:px-8 py-8">
         <PageHeader title="Admin Dashboard" />
@@ -21,11 +32,6 @@ export default function AdminDashboardPage() {
         </div>
       </div>
     );
-  }
-
-  if (!isAdmin) {
-    router.push('/login');
-    return null;
   }
 
   // IMPORTANT: Replace this with your actual Power BI public report URL
@@ -50,7 +56,7 @@ export default function AdminDashboardPage() {
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Note for Admin</AlertTitle>
           <AlertDescription>
-            To see your data, please replace the placeholder Power BI URL in the code with your actual public report URL. You can find this in the file: <code>src/app/admin/dashboard/page.tsx</code>.
+            To see your data, please replace the placeholder Power BI URL in the code with your actual public report URL. You can find this in the file: src/app/admin/dashboard/page.tsx.
           </AlertDescription>
         </Alert>
       </main>
