@@ -1,0 +1,139 @@
+/**
+ * This ruleset enforces a dual security model for a heritage application.
+ *
+ * Core Philosophy:
+ * The security model is split into two distinct parts: publicly accessible content
+ * and privately owned user data. All heritage sites and artifacts are globally
+ * readable to facilitate easy discovery by any user, including anonymous ones.
+ * In contrast, all user-specific data, such as profiles and preferences, is
+ * strictly private and accessible only by the authenticated owner of that data.
+ * Client-side writes to public collections are disabled to ensure data integrity,
+ * implying content is managed by a trusted backend service (e.g., using the Admin SDK).
+ *
+ * Data Structure:
+ * The data is organized into three top-level collections:
+ * 1. /sites: A public, read-only collection of all heritage sites.
+ * 2. /artifacts: A public, read-only collection of all artifacts.
+ * 3. /users: A private collection where each document, identified by a user's
+ *    UID, contains user-specific data. This collection contains a nested
+ *    subcollection for user preferences (/users/{userId}/preferences).
+ *
+ * Key Security Decisions:
+ * - Public Read-Only Content: The `/sites` and `/artifacts` collections are
+ *   world-readable but cannot be modified by client applications. This prevents
+ *   vandalism and ensures data quality.
+ * - Strict User Ownership: All documents and subcollections under `/users/{userId}`
+ *   can only be accessed by the user whose UID matches `{userId}`.
+ * - User Privacy: Listing the entire `/users` collection is explicitly disallowed
+ *   to prevent enumeration of the user base.
+ * - Denormalization for Authorization: The rules rely on path-based ownership
+ *   (e.g., using `{userId}` from the path) to grant access, which is highly
+ *   performant and avoids costly `get()` calls to other documents for
+ *   authorization checks.
+ * - Structural Segregation: Public content (`sites`, `artifacts`) and private
+ *   user data (`users`) are stored in separate top-level collections. This is a
+ *   best practice that simplifies rules and makes list operations more secure
+ *   and efficient.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --------------------------------------------------------------------
+    // Helper Functions
+    // --------------------------------------------------------------------
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user's ID matches the provided userId.
+     * This is the primary function for establishing document ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * A robust check for update/delete operations, ensuring the document
+     * exists and the user is the owner. This prevents unauthorized writes
+     * and errors on non-existent documents.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    // --------------------------------------------------------------------
+    // Public Collections
+    // --------------------------------------------------------------------
+
+    /**
+     * @description Allows public, read-only access to all heritage site data.
+     * @path /sites/{siteId}
+     * @allow An unauthenticated user reading a site document: `(get) /sites/some-site-id`
+     * @deny Any user, authenticated or not, trying to create a site: `(create) /sites/new-site`
+     * @principle Secures public data by making it read-only from the client-side. Content management must be done via a trusted backend (Admin SDK).
+     */
+    match /sites/{siteId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows public, read-only access to all artifact data.
+     * @path /artifacts/{artifactId}
+     * @allow An anonymous user listing all artifacts: `(list) /artifacts`
+     * @deny An authenticated user trying to delete an artifact: `(delete) /artifacts/some-artifact`
+     * @principle Secures public data by making it read-only from the client-side. Content management must be done via a trusted backend (Admin SDK).
+     */
+    match /artifacts/{artifactId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // --------------------------------------------------------------------
+    // User-Private Collections
+    // --------------------------------------------------------------------
+
+    /**
+     * @description Manages user profile documents. Restricts all access to the document owner and prevents user enumeration.
+     * @path /users/{userId}
+     * @allow A signed-in user creating their own user document: `(create) /users/user-abc` where `auth.uid == 'user-abc'`.
+     * @deny A signed-in user trying to read another user's document: `(get) /users/user-xyz` where `auth.uid == 'user-abc'`.
+     * @deny Any user trying to list all users: `(list) /users`.
+     * @principle Enforces a strict data ownership model where users can only access their own document.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Manages a user's preferences document. Access is inherited from the parent user document.
+       * @path /users/{userId}/preferences/{preferencesId}
+       * @allow The owner of the user document updating their preferences: `(update) /users/user-abc/preferences/user-abc` where `auth.uid == 'user-abc'`.
+       * @deny A different user trying to read someone's preferences: `(get) /users/user-xyz/preferences/user-xyz` where `auth.uid == 'user-abc'`.
+       * @principle Restricts access to a user's own data tree using path-based ownership and validates relational integrity.
+       */
+      match /preferences/{preferencesId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.id == preferencesId && preferencesId == userId;
+        allow update: if isOwner(userId) && request.resource.data.id == resource.data.id;
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+  }
+}

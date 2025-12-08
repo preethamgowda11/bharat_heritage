@@ -1,0 +1,251 @@
+{
+  "entities": {
+    "Site": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Site",
+      "type": "object",
+      "description": "Represents a heritage site with its associated details.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Site entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the heritage site."
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "A brief description of the heritage site."
+        },
+        "longDescription": {
+          "type": "string",
+          "description": "A detailed description of the heritage site."
+        },
+        "thumbnailUrl": {
+          "type": "string",
+          "description": "URL of the thumbnail image for the site."
+        },
+        "coverImageUrl": {
+          "type": "string",
+          "description": "URL of the cover image for the site."
+        },
+        "lowPolyModelUrl": {
+          "type": "string",
+          "description": "URL of the low-polygon 3D model for the site."
+        },
+        "highPolyModelUrl": {
+          "type": "string",
+          "description": "URL of the high-polygon 3D model for the site."
+        },
+        "fallback360Url": {
+          "type": "string",
+          "description": "URL of the 360° panorama image for the site (fallback)."
+        },
+        "audioNarrationUrl": {
+          "type": "string",
+          "description": "URL of the audio narration for the site."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "shortDescription",
+        "longDescription",
+        "thumbnailUrl",
+        "coverImageUrl"
+      ]
+    },
+    "Artifact": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Artifact",
+      "type": "object",
+      "description": "Represents an artifact associated with a heritage site.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Artifact entity."
+        },
+        "siteId": {
+          "type": "string",
+          "description": "Reference to Site. (Relationship: Site 1:N Artifact)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the artifact."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the artifact."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image for the artifact."
+        },
+        "modelFileUrl": {
+          "type": "string",
+          "description": "URL of the 3D model file for the artifact."
+        },
+        "fallbackImageUrl": {
+          "type": "string",
+          "description": "URL of the fallback image for the artifact."
+        },
+        "audioNarrationUrl": {
+          "type": "string",
+          "description": "URL of the audio narration for the artifact."
+        }
+      },
+      "required": [
+        "id",
+        "siteId",
+        "title",
+        "description",
+        "imageUrl"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "preferences": {
+          "type": "string",
+          "description": "Reference to UserPreferences. (Relationship: User 1:1 UserPreferences)"
+        },
+        "favorites": {
+          "type": "array",
+          "description": "References to Sites. (Relationship: User N:N Site)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "UserPreferences": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserPreferences",
+      "type": "object",
+      "description": "Stores user-specific preferences for the application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserPreferences entity."
+        },
+        "accessibilityOn": {
+          "type": "boolean",
+          "description": "Indicates whether accessibility mode is enabled."
+        },
+        "audioOn": {
+          "type": "boolean",
+          "description": "Indicates whether audio narration is enabled."
+        },
+        "fontScale": {
+          "type": "number",
+          "description": "The font scaling factor for the user interface."
+        },
+        "highContrast": {
+          "type": "boolean",
+          "description": "Indicates whether high contrast mode is enabled."
+        },
+        "lowBandwidth": {
+          "type": "boolean",
+          "description": "Indicates whether low bandwidth mode is enabled."
+        },
+        "language": {
+          "type": "string",
+          "description": "The user's preferred language."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/sites/{siteId}",
+        "definition": {
+          "entityName": "Site",
+          "schema": {
+            "$ref": "#/backend/entities/Site"
+          },
+          "description": "Stores heritage site data. Globally readable.",
+          "params": [
+            {
+              "name": "siteId",
+              "description": "Unique identifier for the heritage site."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/artifacts/{artifactId}",
+        "definition": {
+          "entityName": "Artifact",
+          "schema": {
+            "$ref": "#/backend/entities/Artifact"
+          },
+          "description": "Stores artifact data. Globally readable. The 'siteId' field references the associated site.",
+          "params": [
+            {
+              "name": "artifactId",
+              "description": "Unique identifier for the artifact."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user data. Access is restricted to the authenticated user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "Unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/preferences/{preferencesId}",
+        "definition": {
+          "entityName": "UserPreferences",
+          "schema": {
+            "$ref": "#/backend/entities/UserPreferences"
+          },
+          "description": "Stores user preferences. Access is restricted to the authenticated user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "Unique identifier for the user."
+            },
+            {
+              "name": "preferencesId",
+              "description": "Unique identifier for the preferences document (should match userId)."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to optimize for read operations, ensure security, and maintain data consistency. It leverages path-based ownership for user-specific data and denormalization to avoid complex security rules with `get()` calls. The structure adheres to the principle of homogeneous security posture within collections.\n\n1.  **Sites Collection:** Stores the heritage site data. This collection is globally readable. All documents within `/sites` have the same access requirements (public read access).\n2.  **Artifacts Collection:** Stores artifact data. This collection is globally readable. All documents within `/artifacts` have the same access requirements (public read access). The `siteId` field links artifacts to their respective sites.\n3.  **Users Collection:** Contains user-specific data, including user preferences and favorites. Access is restricted to the authenticated user.\n4.  **User Preferences Subcollection:** Stores the user preferences. This uses a hierarchical path, `/users/{userId}/preferences/{preferencesId}`, for exclusive access to the data by the authorized user.\n\n**Authorization Independence:** The data structure avoids hierarchical authorization dependencies. For example, artifact documents do not require fetching site information to determine access.\n\n**QAPs Support:**\n\n*   **List Operations:** The segregation of data into collections with homogeneous security postures allows for secure list operations. For example, listing sites or artifacts does not require filtering based on authorization.\n\nThis structure facilitates simple and robust security rules by:\n\n*   Using path-based ownership for user data.\n*   Avoiding `get()` calls in security rules by denormalizing data where necessary.\n*   Ensuring that all documents within a collection have the same security requirements."
+  }
+}
