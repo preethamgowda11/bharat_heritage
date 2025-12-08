@@ -1,3 +1,4 @@
+
 // src/components/sites/NearbyPlaces.tsx
 'use client';
 import React, { useEffect, useState } from 'react';
@@ -5,7 +6,7 @@ import { fetchNearbyPOIs, type POI } from '@/lib/places';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Building, Hotel, MapPin, Tent, Landmark } from 'lucide-react';
+import { Building, Hotel, MapPin, Tent, Landmark, Mountain, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface NearbyPlacesProps {
@@ -22,6 +23,8 @@ const getIconForTag = (tags: Record<string, string>) => {
     if (tourism === 'guest_house' || tourism === 'hostel') return <Tent className="w-5 h-5 text-accent" />;
     if (tourism === 'apartment') return <Building className="w-5 h-5 text-accent" />;
     if (tourism === 'attraction' || tags.historic) return <Landmark className="w-5 h-5 text-accent" />;
+    if (tourism === 'viewpoint') return <Eye className="w-5 h-5 text-accent" />;
+    if (tags.natural === 'peak') return <Mountain className="w-5 h-5 text-accent" />;
     return <MapPin className="w-5 h-5 text-accent" />;
 }
 
@@ -35,7 +38,7 @@ const PoiCard: React.FC<{ poi: POI }> = ({ poi }) => (
     </CardHeader>
     <CardContent>
       <div className="text-sm text-muted-foreground capitalize">
-        {poi.tags.tourism?.replace(/_/g, ' ') || poi.tags.amenity?.replace(/_/g, ' ') || poi.tags.historic || 'Place'}
+        {poi.tags.tourism?.replace(/_/g, ' ') || poi.tags.amenity?.replace(/_/g, ' ') || poi.tags.historic?.replace(/_/g, ' ') || poi.tags.natural?.replace(/_/g, ' ') || 'Place'}
       </div>
       {poi.lat && poi.lon && (
         <a 
@@ -72,9 +75,11 @@ const LoadingSkeleton = () => (
 export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesProps) {
   const [hotels, setHotels] = useState<POI[]>([]);
   const [tourist, setTourist] = useState<POI[]>([]);
+  const [offbeat, setOffbeat] = useState<POI[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAllStays, setShowAllStays] = useState(false);
   const [showAllTourist, setShowAllTourist] = useState(false);
+  const [showAllOffbeat, setShowAllOffbeat] = useState(false);
 
   useEffect(() => {
     if (!lat || !lon) {
@@ -93,9 +98,14 @@ export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesPr
       const touristTags = ['tourism=attraction', 'tourism=museum', 'historic=yes'];
       const touristRes = await fetchNearbyPOIs(lat, lon, radius, touristTags);
 
+      // Offbeat places
+      const offbeatTags = ['tourism=viewpoint', 'historic=ruins', 'natural=peak', 'historic=archaeological_site'];
+      const offbeatRes = await fetchNearbyPOIs(lat, lon, radius, offbeatTags);
+
       if (mounted) {
         setHotels(hotelsRes);
         setTourist(touristRes);
+        setOffbeat(offbeatRes);
         setLoading(false);
       }
     };
@@ -108,7 +118,7 @@ export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesPr
     pois: POI[], 
     showAll: boolean, 
     toggleShowAll: () => void, 
-    type: 'stays' | 'spots'
+    type: string
     ) => {
     const visiblePois = showAll ? pois : pois.slice(0, INITIAL_DISPLAY_COUNT);
     return (
@@ -133,8 +143,9 @@ export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesPr
     <section className="mb-12">
         <h2 className="text-3xl font-headline text-center mb-8">Nearby Stays & Places</h2>
         <Tabs defaultValue="stays" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3">
                 <TabsTrigger value="stays">Stays</TabsTrigger>
+                <TabsTrigger value="offbeat">Offbeat Places</TabsTrigger>
                 <TabsTrigger value="tourist">Tourist Spots</TabsTrigger>
             </TabsList>
             <TabsContent value="stays">
@@ -142,6 +153,13 @@ export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesPr
                     hotels.length > 0 ? (
                         renderPoiList(hotels, showAllStays, () => setShowAllStays(prev => !prev), 'stays')
                     ) : <p className="text-center text-muted-foreground mt-8">No nearby stays found within {radius / 1000}km.</p>
+                )}
+            </TabsContent>
+            <TabsContent value="offbeat">
+                {loading ? <LoadingSkeleton /> : (
+                    offbeat.length > 0 ? (
+                        renderPoiList(offbeat, showAllOffbeat, () => setShowAllOffbeat(prev => !prev), 'places')
+                    ) : <p className="text-center text-muted-foreground mt-8">No offbeat places found within {radius / 1000}km.</p>
                 )}
             </TabsContent>
             <TabsContent value="tourist">
