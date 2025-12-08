@@ -21,9 +21,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
 
+  // This effect will run ONCE when the component mounts.
+  // If the user is already logged in when they visit this page, redirect them.
   useEffect(() => {
     if (user) {
-      router.push('/');
+      router.push('/admin/dashboard');
     }
   }, [user, router]);
   
@@ -36,7 +38,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsSigningIn(true);
     
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if(user) {
         toast({
           title: 'Success',
@@ -44,6 +46,7 @@ export default function LoginPage() {
         });
         router.push('/admin/dashboard');
         setIsSigningIn(false);
+        unsubscribe(); // Clean up the listener once we've redirected
       }
     }, (error) => {
         toast({
@@ -52,6 +55,7 @@ export default function LoginPage() {
           description: error.message || 'Could not sign in. Please check your credentials.',
         });
         setIsSigningIn(false);
+        unsubscribe(); // Clean up listener on error too
     });
 
     initiateEmailSignIn(auth, email, password);
@@ -59,7 +63,7 @@ export default function LoginPage() {
   
   const handleAnonymousSignIn = () => {
     setIsSigningIn(true);
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
             toast({
                 title: 'Signed in as Guest',
@@ -67,6 +71,7 @@ export default function LoginPage() {
             });
             router.push('/');
             setIsSigningIn(false);
+            unsubscribe();
         }
     });
     initiateAnonymousSignIn(auth);
