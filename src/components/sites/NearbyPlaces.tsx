@@ -92,22 +92,27 @@ export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: Nearby
     setLoading(true);
 
     const fetchData = async () => {
-      // Hotels, guesthouses, hostels, apartments
-      const hotelTags = ['tourism=hotel', 'tourism=guest_house', 'tourism=hostel', 'tourism=apartment'];
-      const hotelsRes = await fetchNearbyPOIs(lat, lon, radius, hotelTags);
+      const allTags = [
+        'tourism=hotel', 'tourism=guest_house', 'tourism=hostel', 'tourism=apartment', // Stays
+        'tourism=attraction', 'tourism=museum', 'historic=yes', // Tourist
+        'tourism=viewpoint', 'historic=ruins', 'natural=peak', 'historic=archaeological_site' // Offbeat
+      ];
       
-      // Tourist attractions
-      const touristTags = ['tourism=attraction', 'tourism=museum', 'historic=yes'];
-      const touristRes = await fetchNearbyPOIs(lat, lon, radius, touristTags);
-
-      // Offbeat places
-      const offbeatTags = ['tourism=viewpoint', 'historic=ruins', 'natural=peak', 'historic=archaeological_site'];
-      const offbeatRes = await fetchNearbyPOIs(lat, lon, radius, offbeatTags);
+      const allPois = await fetchNearbyPOIs(lat, lon, radius, allTags);
 
       if (mounted) {
-        setHotels(hotelsRes);
-        setTourist(touristRes);
-        setOffbeat(offbeatRes);
+        const hotelTags = new Set(['hotel', 'guest_house', 'hostel', 'apartment']);
+        const touristTags = new Set(['attraction', 'museum']);
+        const offbeatTags = new Set(['viewpoint', 'ruins', 'peak', 'archaeological_site']);
+
+        const staysData = allPois.filter(p => hotelTags.has(p.tags.tourism));
+        const touristData = allPois.filter(p => touristTags.has(p.tags.tourism) || p.tags.historic === 'yes');
+        const offbeatData = allPois.filter(p => offbeatTags.has(p.tags.tourism) || offbeatTags.has(p.tags.historic) || offbeatTags.has(p.tags.natural));
+
+        setHotels(staysData);
+        setTourist(touristData);
+        setOffbeat(offbeatData);
+
         setLoading(false);
       }
     };
