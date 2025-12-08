@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { LostSite } from '@/types';
