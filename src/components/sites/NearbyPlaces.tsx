@@ -85,7 +85,7 @@ export default function NearbyPlaces({ lat, lon, radius = 5000 }: NearbyPlacesPr
       const hotelsRes = await fetchNearbyPOIs(lat, lon, radius, hotelTags);
       
       // Tourist attractions
-      const touristTags = ['tourism=attraction', 'tourism=museum', 'historic'];
+      const touristTags = ['tourism=attraction', 'tourism=museum', 'historic=yes'];
       const touristRes = await fetchNearbyPOIs(lat, lon, radius, touristTags);
 
       if (mounted) {
