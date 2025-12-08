@@ -2,15 +2,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth, useUser, initiateEmailSignIn, initiateAnonymousSignIn } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { initiateEmailSignIn } from '@/firebase';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { onAuthStateChanged } from 'firebase/auth';
+import { Separator } from '@/components/ui/separator';
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -54,6 +54,21 @@ export default function LoginPage() {
 
     initiateEmailSignIn(auth, email, password);
   };
+  
+  const handleAnonymousSignIn = () => {
+    setIsSigningIn(true);
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            toast({
+                title: 'Signed in as Guest',
+                description: 'You are now signed in anonymously.',
+            });
+            router.push('/');
+            setIsSigningIn(false);
+        }
+    });
+    initiateAnonymousSignIn(auth);
+  };
 
   return (
     <div className="container mx-auto flex items-center justify-center p-4" style={{ height: 'calc(100vh - 4rem)'}}>
@@ -90,6 +105,17 @@ export default function LoginPage() {
             </Button>
           </form>
         </CardContent>
+        <CardFooter className="flex flex-col gap-4">
+            <div className="relative w-full">
+                <Separator />
+                <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-background px-2 text-sm text-muted-foreground">
+                    OR
+                </span>
+            </div>
+            <Button variant="outline" className="w-full" onClick={handleAnonymousSignIn} disabled={isSigningIn}>
+                Sign in as Guest
+            </Button>
+        </CardFooter>
       </Card>
     </div>
   );
