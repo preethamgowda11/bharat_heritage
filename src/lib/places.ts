@@ -12,8 +12,20 @@ export interface POI {
 export async function fetchNearbyPOIs(lat: number, lon: number, radius = 1000, tags: string[] = []): Promise<POI[]> {
   // tags: array of Overpass tag clauses, e.g. ["tourism=hotel","tourism=guest_house"]
   if (!lat || !lon) return [];
-  const tagClause = tags.map(t => `node[${t}](around:${radius},${lat},${lon});`).join('');
-  const query = `[out:json][timeout:15];(${tagClause});out center;`;
+  
+  const queryBody = tags.map(tag => {
+    const parts = tag.split('=');
+    const key = parts[0];
+    const value = parts.length > 1 ? parts[1] : null;
+    
+    if (value) {
+      return `node["${key}"="${value}"](around:${radius},${lat},${lon});`;
+    }
+    return `node["${key}"](around:${radius},${lat},${lon});`;
+  }).join('\n');
+
+  const query = `[out:json][timeout:15];\n(\n${queryBody}\n);\nout center;`;
+  
   const url = 'https://overpass-api.de/api/interpreter';
   try {
     const res = await fetch(url, { method: 'POST', body: query });
