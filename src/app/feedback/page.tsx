@@ -28,7 +28,7 @@ function FeedbackForm() {
     const formData = new FormData(event.currentTarget);
     
     // IMPORTANT: Replace with your own Formspree endpoint
-    const formspreeEndpoint = 'https://formspree.io/f/your-id';
+    const formspreeEndpoint = 'https://formspree.io/f/xgvglagw';
 
     try {
       const response = await fetch(formspreeEndpoint, {

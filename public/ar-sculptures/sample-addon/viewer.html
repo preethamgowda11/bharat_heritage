@@ -55,7 +55,7 @@
            device-orientation-permission-ui="enabled: false"
            embedded>
 
-    <a-camera look-controls="enabled: false"></a-camera>
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     <!-- Anchor for targetIndex:0 — no GLB model here, just an invisible plane as anchor -->
     <a-entity id="targetEntity" mindar-image-target="targetIndex: 0">
@@ -67,7 +67,7 @@
 
   <script>
     // The paragraph you gave
-    const paragraph = `One of the most intriguing sculptures is that of a giraffe—an animal not native to India. Its presence indicates knowledge of the animal even if it didn’t live here. Does it point to trade links with Africa? Probably yes. Imagine a trader explaining the long-necked creature to a sculptor, or perhaps an African trader gifted the animal.`;
+    const paragraph = 'One of the most intriguing sculptures is that of a giraffe—an animal not native to India. Its presence indicates knowledge of the animal even if it didn’t live here. Does it point to trade links with Africa? Probably yes. Imagine a trader explaining the long-necked creature to a sculptor, or perhaps an African trader gifted the animal.';
 
     // Speech settings
     const speechOptions = { lang: 'en-US', rate: 1.0, pitch: 1.0, volume: 1.0 };
