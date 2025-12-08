@@ -32,7 +32,7 @@
         "or": "ହାମ୍ପି ଗୋଟିଏ ସଙ୍କଟଗ୍ରସ୍ତ ପରମ୍ପରା ସ୍ଥଳ ଯେଉଁଥିରେ କ୍ଷୟ, ଭାଙ୍ଗିବା ଏବଂ ପର୍ଯ୍ୟଟନ ଚାପ ବଢ଼ିଚାଲିଛି।"
       },
 
-      "image": "images/hampi.jpg"
+      "image": "/assets/lost_india/hampi.jpeg"
     },
 
     {
@@ -75,7 +75,7 @@
         "or": "ଦ୍ୱାରକା ଜଳନଗର ପାଉରାଣିକ କଥା ଓ ପୁରାତତ୍ତ୍ୱର ମିଶ୍ରଣ। ପ୍ରମାଣ କେବଳ ରଚନାମାନଙ୍କୁ ଦେଖାଏ, ସମ୍ପୂର୍ଣ୍ଣ ନଗରକୁ ନୁହେଁ।"
       },
 
-      "image": "images/dwarka.jpg"
+      "image": "/assets/lost_india/dwaraka-underwater-city.jpeg"
     },
 
     {
@@ -110,7 +110,7 @@
         "or": "ଲୋକନାଥ ଶିବ ମନ୍ଦିର ଆର୍ଦ୍ରତା ଓ ସମୁଦ୍ର ଲବଣ ଯୋଗୁଁ କ୍ଷୟ ହେଉଛି।"
       },
 
-      "image": "images/lokanatha.jpg"
+      "image": "/assets/lost_india/lokanatha-siva-temple.jpeg"
     },
 
     {
@@ -145,7 +145,7 @@
         "or": "ସିସୁପାଲଗଡ଼ ଅତିକ୍ରମଣ ଓ ପୁରାତତ୍ତ୍ୱ ନଷ୍ଟ ଯୋଗୁଁ ସଙ୍କଟରେ।"
       },
 
-      "image": "images/sisupalgarh.jpg"
+      "image": "/assets/lost_india/sisupalgarh.jpeg"
     },
     {
       "id": "unakoti",
@@ -187,7 +187,7 @@
         "or": "ଉନକୋଟି ତ୍ରିପୁରାର ଗୋଟିଏ ଭୁଲାହୋଇଥିବା ସ୍ଥାନ ଯେଉଁଠାରେ ବିଶାଳ ପୁରାତନ ଶିଳା ଖୋଦନ ମିଳେ।"
       },
 
-      "image": "images/unakoti.jpg"
+      "image": "/assets/lost_india/Unakoti-Rock-Carvings.jpeg"
     }
   ]
 }

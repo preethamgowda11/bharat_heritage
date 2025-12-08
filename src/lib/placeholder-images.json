@@ -213,31 +213,31 @@
     {
       "id": "lost-india-hampi",
       "description": "Image of Hampi for Lost India page",
-      "imageUrl": "/images/hampi.jpg",
+      "imageUrl": "/assets/lost_india/hampi.jpeg",
       "imageHint": "hampi endangered"
     },
     {
-      "id": "lost-india-dwarka",
+      "id": "lost-india-dwarka_underwater",
       "description": "Image of Dwarka Underwater City for Lost India page",
-      "imageUrl": "/images/dwarka.jpg",
+      "imageUrl": "/assets/lost_india/dwaraka-underwater-city.jpeg",
       "imageHint": "dwarka underwater"
     },
     {
-      "id": "lost-india-lokanatha",
+      "id": "lost-india-lokanatha_siva_temple",
       "description": "Image of Lokanatha Siva Temple for Lost India page",
-      "imageUrl": "/images/lokanatha.jpg",
+      "imageUrl": "/assets/lost_india/lokanatha-siva-temple.jpeg",
       "imageHint": "lokanatha temple"
     },
     {
       "id": "lost-india-sisupalgarh",
       "description": "Image of Sisupalgarh Fort City for Lost India page",
-      "imageUrl": "/images/sisupalgarh.jpg",
+      "imageUrl": "/assets/lost_india/sisupalgarh.jpeg",
       "imageHint": "sisupalgarh fort"
     },
     {
       "id": "lost-india-unakoti",
       "description": "Image of Unakoti Rock Carvings for Lost India page",
-      "imageUrl": "/images/unakoti.jpg",
+      "imageUrl": "/assets/lost_india/Unakoti-Rock-Carvings.jpeg",
       "imageHint": "unakoti carvings"
     }
   ]
