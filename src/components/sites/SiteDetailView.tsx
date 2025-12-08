@@ -16,6 +16,7 @@ import { ModelViewer } from '@/components/common/ModelViewer';
 import { BionicReading } from '@/components/common/BionicReading';
 import { Separator } from '../ui/separator';
 import NearbyPlaces from './NearbyPlaces';
+import PlaceSuggestionForm from '@/components/PlaceSuggestionForm';
 
 interface SiteDetailViewProps {
   site: Site;
@@ -97,6 +98,10 @@ export function SiteDetailView({ site }: SiteDetailViewProps) {
       </div>
 
       <div className="text-center my-6 flex justify-center gap-4">
+      <div className="mr-2"> 
+        <PlaceSuggestionForm siteId={site.id} lat={site.lat} lon={site.lon} onAfterSubmit={() => { /* optional: refresh nearby list */ }} />
+      </div>
+
         {modelUrl && (
           <Button variant="outline" onClick={handleToggle3DModel}>
             {show3DModel ? (
