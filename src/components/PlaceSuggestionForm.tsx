@@ -2,6 +2,13 @@
 import React, { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getDb, initFirebaseClient } from '@/lib/firebaseClient';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 initFirebaseClient();
 
@@ -14,17 +21,24 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
   const [website, setWebsite] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const { toast } = useToast();
 
-  const reset = () => { setName(''); setCategory('offbeat'); setAddress(''); setPhone(''); setWebsite(''); setDescription(''); setError(''); };
+  const reset = () => { setName(''); setCategory('offbeat'); setAddress(''); setPhone(''); setWebsite(''); setDescription(''); };
 
   const submit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    setError('');
-    if (!name.trim()) { setError('Please enter name'); return; }
-    if (!address.trim()) { setError('Please enter an address'); return; }
-    if (!description.trim()) { setError('Please enter a short description'); return; }
+    if (!name.trim()) { 
+      toast({ variant: 'destructive', title: 'Error', description: 'Please enter a name for the place.' });
+      return; 
+    }
+    if (!address.trim()) { 
+      toast({ variant: 'destructive', title: 'Error', description: 'Please enter an address for the place.' });
+      return; 
+    }
+    if (!description.trim()) { 
+      toast({ variant: 'destructive', title: 'Error', description: 'Please enter a short description.' });
+      return; 
+    }
     setLoading(true);
     try {
       const db = getDb();
@@ -42,54 +56,71 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
         status: 'pending',
         createdAt: serverTimestamp()
       });
-      setSuccess('Thanks — suggestion submitted for review.');
+      toast({ title: 'Success', description: 'Thanks — suggestion submitted for review.'});
       reset();
       onAfterSubmit && onAfterSubmit();
-      setTimeout(() => { setOpen(false); setSuccess(''); }, 1400);
-    } catch (err) {
+      setTimeout(() => { setOpen(false); }, 1400);
+    } catch (err: any) {
       console.error(err);
-      setError('Submission failed — try again later');
+      toast({ variant: 'destructive', title: 'Submission failed', description: err.message || 'Could not submit suggestion. Please try again later.' });
     } finally { setLoading(false); }
   };
 
   return (
-    <div>
-      <button onClick={() => setOpen(true)} className="inline-flex items-center px-3 py-2 rounded bg-indigo-600 text-white">Suggest</button>
+    <>
+      <Button onClick={() => setOpen(true)} variant="secondary">Suggest a Place</Button>
 
-      {open && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)' }}>
-          <div style={{ width: 820, maxWidth: '96%', background: '#fff', borderRadius: 10, padding: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0 }}>Suggest a place</h3>
-              <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', fontSize: 18 }}>✕</button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Suggest a Place</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={submit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name (required)</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., The Heritage Cafe" />
+              </div>
+              <div className="space-y-2">
+                 <Label htmlFor="category">Category</Label>
+                <Select value={category} onValueChange={(v: any) => setCategory(v)}>
+                    <SelectTrigger id="category">
+                        <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="hotel">Hotel / Homestay</SelectItem>
+                        <SelectItem value="tourist">Tourist Place</SelectItem>
+                        <SelectItem value="offbeat">Offbeat / Local Spot</SelectItem>
+                    </SelectContent>
+                </Select>
+              </div>
+               <div className="col-span-1 md:col-span-2 space-y-2">
+                <Label htmlFor="address">Address (required)</Label>
+                <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Full address" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone (optional)</Label>
+                <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Contact number" />
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="website">Website (optional)</Label>
+                <Input id="website" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" />
+              </div>
+              <div className="col-span-1 md:col-span-2 space-y-2">
+                <Label htmlFor="description">Short description (required)</Label>
+                <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What makes this place special?" />
+              </div>
             </div>
 
-            <form onSubmit={submit} style={{ marginTop: 12 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Name (required)" style={{ padding: 8, borderRadius: 6, border: '1px solid #ddd' }} />
-                <select value={category} onChange={(e:any)=>setCategory(e.target.value)} style={{ padding: 8, borderRadius: 6 }}>
-                  <option value="hotel">Hotel / Homestay</option>
-                  <option value="tourist">Tourist Place</option>
-                  <option value="offbeat">Offbeat / Local Spot</option>
-                </select>
-                <input value={address} onChange={(e)=>setAddress(e.target.value)} placeholder="Address (required)" style={{ padding: 8, borderRadius: 6, border: '1px solid #ddd' }} />
-                <input value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder="Phone (optional)" style={{ padding: 8, borderRadius: 6, border: '1px solid #ddd' }} />
-                <input value={website} onChange={(e)=>setWebsite(e.target.value)} placeholder="Website (optional)" style={{ padding: 8, borderRadius: 6, border: '1px solid #ddd' }} />
-                <div></div>
-                <textarea value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="Short description (required)" style={{ gridColumn: '1 / -1', padding: 8, minHeight: 120, borderRadius: 6, border: '1px solid #ddd' }} />
-              </div>
-
-              {error && <div style={{ color: 'crimson', marginTop: 10 }}>{error}</div>}
-              {success && <div style={{ color: 'green', marginTop: 10 }}>{success}</div>}
-
-              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>
-                <button type="button" onClick={() => { setOpen(false); reset(); }} style={{ padding: '8px 12px', borderRadius: 6 }}>Cancel</button>
-                <button type="submit" disabled={loading} style={{ padding: '8px 14px', background: '#0b66ff', color: '#fff', borderRadius: 6 }}>{loading ? 'Submitting...' : 'Submit'}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="ghost">Cancel</Button>
+              </DialogClose>
+              <Button type="submit" disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
