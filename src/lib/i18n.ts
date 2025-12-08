@@ -82,6 +82,20 @@ const dictionary: Record<string, Record<Language, string>> = {
     'or': 'ଭାରତର ଅତୀତର ଏହି ଅନନ୍ୟ ବସ୍ତୁଗୁଡ଼ିକ ସହିତ ସମୟ ମାଧ୍ୟମରେ ଯାତ୍ରା କରନ୍ତୁ।',
   },
 
+  // Lost India Page
+  'lost_india_title': {
+    'en': 'Lost India: Explore the Unseen',
+    'hi': 'खोया भारत: अनदेखे को देखें',
+    'kn': 'ಕಳೆದುಹೋದ ಭಾರತ: ಕಾಣದನ್ನು ಅನ್ವೇಷಿಸಿ',
+    'or': 'ହଜିଲା ଭାରତ: ଅଦୃଶ୍ୟକୁ ଅନୁସନ୍ଧାନ କରନ୍ତୁ',
+  },
+  'lost_india_description': {
+    'en': 'Discover endangered sites, forgotten history, and the myths surrounding them.',
+    'hi': 'संकटग्रस्त स्थलों, भूले हुए इतिहास और उनसे जुड़े मिथकों की खोज करें।',
+    'kn': 'ಅಪಾಯದಲ್ಲಿರುವ ತಾಣಗಳು, ಮರೆತುಹೋದ ಇತಿಹಾಸ ಮತ್ತು ಅವುಗಳನ್ನು ಸುತ್ತುವರಿದಿರುವ ಪುರಾಣಗಳನ್ನು ಅನ್ವೇಷಿಸಿ.',
+    'or': 'ବିପଦଗ୍ରସ୍ତ ସ୍ଥାନ, ଭୁଲିଯାଇଥିବା ଇତିହାସ, ଏବଂ ସେଗୁଡ଼ିକର ପୌରାଣିକ କାହାଣୀ ଆବିଷ୍କାର କରନ୍ତୁ।',
+  },
+
   // Buttons
   'back_to_home': {
     'en': 'Back to Home',

@@ -1,0 +1,151 @@
+{
+  "lost_india_explore_unseen": [
+    {
+      "id": "hampi",
+      "title": {
+        "en": "Hampi",
+        "hi": "हम्पी",
+        "kn": "ಹಂಪಿ",
+        "or": "ହାମ୍ପି"
+      },
+      "category": "endangered",
+      "threat_level": "red",
+
+      "description": {
+        "en": "Hampi, once the capital of the Vijayanagara Empire, is one of India's richest archaeological landscapes. Today it faces erosion, cracks, and increasing tourist pressure.",
+        "hi": "हम्पी, विजयनगर साम्राज्य की राजधानी, भारत का एक महत्वपूर्ण पुरातात्विक क्षेत्र है। आज यह क्षरण, दरारें और बढ़ते पर्यटन के कारण खतरे में है।",
+        "kn": "ಹಂಪಿ, ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯದ ರಾಜಧಾನಿಯಾಗಿದ್ದು, ಭಾರತದ ಪ್ರಮುಖ ಪುರಾತತ್ವ ಸ್ಥಳಗಳಲ್ಲಿ ಒಂದಾಗಿದೆ. ಇಂದು ಇದು ಕಲ್ಲಿನ ಹಾಳಾಗುವಿಕೆ, ಬಿರುಕುಗಳು ಮತ್ತು ಪ್ರವಾಸಿಗರ ಒತ್ತಡದಿಂದ ಅಪಾಯದಲ್ಲಿದೆ.",
+        "or": "ହାମ୍ପି, ବିଜୟନଗର ସାମ୍ରାଜ୍ୟର ପୁରୁଣା ରାଜଧାନୀ, ଭାରତର ସବୁଠାରୁ ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ପୁରାତତ୍ତ୍ୱିକ ସ୍ଥାନମାନଙ୍କ ମଧ୍ୟରୁ ଗୋଟିଏ। ବର୍ତ୍ତମାନ ଏହା କ୍ଷୟ, ଭାଙ୍ଗିବା ଏବଂ ପର୍ଯ୍ୟଟନ ଚାପରେ ପଡ଼ିଛି।"
+      },
+
+      "issues": {
+        "en": "Stone erosion, cracks, flooding risk, uncontrolled tourism.",
+        "hi": "पत्थरों का क्षरण, दरारें, बाढ़ का खतरा, अनियंत्रित पर्यटन।",
+        "kn": "ಕಲ್ಲಿನ ಹಾಳಾಗುವಿಕೆ, ಬಿರುಕುಗಳು, ನೆರೆ ಅಪಾಯ, ನಿಯಂತ್ರಣವಿಲ್ಲದ ಪ್ರವಾಸೋದ್ಯಮ.",
+        "or": "ପଥର କ୍ଷୟ, ଦିବାର ଭାଙ୍ଗିବା, ବନ୍ୟା ଝୁମ୍ପ, ଅନିୟନ୍ତ୍ରିତ ପର୍ଯ୍ୟଟନ।"
+      },
+
+      "tts_text": {
+        "en": "Hampi is an endangered heritage site facing erosion, cracks, and heavy tourist pressure.",
+        "hi": "हम्पी एक संकटग्रस्त धरोहर स्थल है जो क्षरण, दरारें और पर्यटन दबाव का सामना कर रहा है।",
+        "kn": "ಹಂಪಿ ಒಂದು ಅಪಾಯದಲ್ಲಿರುವ ಪರಂಪರೆ ತಾಣವಾಗಿದೆ, ಇದು ಹಾಳಾಗುವಿಕೆ, ಬಿರುಕುಗಳು ಮತ್ತು ಪ್ರವಾಸಿಗರ ಒತ್ತಡವನ್ನು ಎದುರಿಸುತ್ತಿದೆ.",
+        "or": "ହାମ୍ପି ଗୋଟିଏ ସଙ୍କଟଗ୍ରସ୍ତ ପରମ୍ପରା ସ୍ଥଳ ଯେଉଁଥିରେ କ୍ଷୟ, ଭାଙ୍ଗିବା ଏବଂ ପର୍ଯ୍ୟଟନ ଚାପ ବଢ଼ିଚାଲିଛି।"
+      },
+
+      "image": "images/hampi.jpg"
+    },
+
+    {
+      "id": "dwarka_underwater",
+      "title": {
+        "en": "Dwarka Underwater City",
+        "hi": "द्वारका पनडुब्बी नगर",
+        "kn": "ದ್ವಾರಕಾ ಜಲನಗರ",
+        "or": "ଦ୍ୱାରକା ଜଳନଗର"
+      },
+      "category": "exaggerated_mythology",
+      "threat_level": "yellow",
+
+      "description": {
+        "en": "Marine archaeology near Gujarat has revealed underwater structures believed to be connected to ancient Dwarka. Legends describe a complete city, but evidence shows only partial remains.",
+        "hi": "गुजरात के तट के पास पानी के नीचे संरचनाएँ मिली हैं जिन्हें प्राचीन द्वारका से जोड़कर देखा जाता है। किंवदंतियाँ पूर्ण नगर का वर्णन करती हैं, परन्तु प्रमाण केवल आंशिक अवशेष दिखाते हैं।",
+        "kn": "ಗುಜರಾತ್ ಕರಾವಳಿಯ ಬಳಿ ನೀರಿನಡಿ ಕಂಡುಬಂದ ರಚನೆಗಳು ಪ್ರಾಚೀನ ದ್ವಾರಕೆಯೊಂದಿಗೆ ಸಂಪರ್ಕ ಹೊಂದಿವೆ ಎಂದು ನಂಬಲಾಗುತ್ತದೆ. ಪೌರಾಣಿಕ ಕಥೆಗಳು ಸಂಪೂರ್ಣ ನಗರವನ್ನು ವಿವರಿಸುತ್ತವೆ, ಆದರೆ ಸಾಕ್ಷಿಗಳು ಭಾಗಿಕ ಅವಶೇಷಗಳನ್ನು ಮಾತ್ರ ತೋರಿಸುತ್ತವೆ.",
+        "or": "ଗୁଜରାଟ ତଟରେ ପାଣିତଳରେ ମିଳିଥିବା ପୁରାତତ୍ତ୍ୱିକ ଗଠନମାନେ ପୁରାତନ ଦ୍ୱାରକା ସହିତ ସମ୍ପର୍କ ଥିବା ବୋଲି ଧରାଯାଏ। କିନ୍ତୁ ପ୍ରମାଣ ମାତ୍ର ଅଂଶିକ ଅବଶେଷ ଦେଖାଏ।"
+      },
+
+      "myth_vs_fact": {
+        "myth": {
+          "en": "A complete underwater city of Krishna still exists.",
+          "hi": "कृष्ण की पूर्ण पनडुब्बी नगरी आज भी मौजूद है।",
+          "kn": "ಕೃಷ್ಣನ ಸಂಪೂರ್ಣ ಜಲನಗರ ಇನ್ನೂ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ.",
+          "or": "କୃଷ୍ଣଙ୍କ ଜଳନଗର ଆଜିପର୍ଯ୍ୟନ୍ତ ସଂପୂର୍ଣ୍ଣ ଅବସ୍ଥାରେ ଅଛି।"
+        },
+        "fact": {
+          "en": "Archaeologists found stone blocks, anchors, and structural remains — not an entire preserved city.",
+          "hi": "पुरातत्वविदों को केवल पत्थर, खंभे और संरचनात्मक अवशेष मिले हैं, पूर्ण नगर नहीं।",
+          "kn": "ಪುರಾತತ್ವ ವಿಜ್ಞಾನಿಗಳು ಕಲ್ಲಿನ ಬ್ಲಾಕ್‌ಗಳು, ನಂಗೂರಗಳು ಮತ್ತು ರಚನಾ ಅವಶೇಷಗಳನ್ನು ಕಂಡಿದ್ದಾರೆ, ಸಂಪೂರ್ಣ ನಗರವಲ್ಲ.",
+          "or": "ପୁରାତତ୍ତ୍ୱବିଦ୍ମାନେ କେବଳ ପଥର ଓ ଅବଶେଷ ମିଳାଇଛନ୍ତି, କିନ୍ତୁ ସମ୍ପୂର୍ଣ୍ଣ ନଗର ନୁହେଁ।"
+        }
+      },
+
+      "tts_text": {
+        "en": "Dwarka underwater city blends mythology and archaeology. Evidence shows structures but not a complete city.",
+        "hi": "द्वारका का जलमग्न नगर मिथक और पुरातत्व का संगम है। प्रमाण संरचनाएँ दिखाते हैं, पूर्ण नगर नहीं।",
+        "kn": "ದ್ವಾರಕಾ ಜಲನಗರ ಪೌರಾಣಿಕತೆ ಮತ್ತು ಪುರಾತತ್ವದ ಸಂಯೋಜನೆ. ಸಾಕ್ಷಿಗಳು ರಚನೆಗಳನ್ನು ತೋರಿಸುತ್ತವೆ, ಸಂಪೂರ್ಣ ನಗರವಲ್ಲ.",
+        "or": "ଦ୍ୱାରକା ଜଳନଗର ପାଉରାଣିକ କଥା ଓ ପୁରାତତ୍ତ୍ୱର ମିଶ୍ରଣ। ପ୍ରମାଣ କେବଳ ରଚନାମାନଙ୍କୁ ଦେଖାଏ, ସମ୍ପୂର୍ଣ୍ଣ ନଗରକୁ ନୁହେଁ।"
+      },
+
+      "image": "images/dwarka.jpg"
+    },
+
+    {
+      "id": "lokanatha_siva_temple",
+      "title": {
+        "en": "Lokanatha Siva Temple",
+        "hi": "लोकनाथ शिव मंदिर",
+        "kn": "ಲೋಕನಾಥ ಶಿವ ದೇವಾಲಯ",
+        "or": "ଲୋକନାଥ ଶିବ ମନ୍ଦିର"
+      },
+      "category": "endangered",
+      "threat_level": "yellow",
+
+      "description": {
+        "en": "Lokanatha Siva Temple in Puri is an ancient spiritual site associated with Shiva and Rama legends. The structure is slowly decaying due to moisture and coastal salt.",
+        "hi": "पुरी का लोकनाथ शिव मंदिर भगवान शिव और राम से संबंधित एक प्राचीन स्थल है। नमी और समुद्री लवणता के कारण यह धीरे-धीरे क्षतिग्रस्त हो रहा है।",
+        "kn": "ಪುರಿಯ ಲೋಕನಾಥ ಶಿವ ದೇವಾಲಯವು ಶಿವ ಮತ್ತು ರಾಮನ ಕಥೆಗಳೊಂದಿಗೆ ಸಂಬಂಧಿಸಿದ ಪ್ರಾಚೀನ ತಾಣವಾಗಿದೆ. ತೇವಾಂಶ ಮತ್ತು ಸಮುದ್ರದ ಉಪ್ಪಿನ ಗಾಳಿಯಿಂದ ಇದು ನಿಧಾನವಾಗಿ ಹಾನಿಯಾಗುತ್ತಿದೆ.",
+        "or": "ପୁରୀର ଲୋକନାଥ ଶିବ ମନ୍ଦିର ଶିବ ଓ ରାମଙ୍କ ପାଉରାଣିକ କଥା ସହିତ ସମ୍ବନ୍ଧିତ ପ୍ରାଚୀନ ସ୍ଥଳ। ଆର୍ଦ୍ରତା ଓ ସମୁଦ୍ର ଲବଣତା ଯୋଗୁଁ ଏହା କ୍ଷତିଗ୍ରସ୍ତ ହେଉଛି।"
+      },
+
+      "issues": {
+        "en": "Moisture damage, salt erosion, algae growth, cracks in walls.",
+        "hi": "नमी से क्षति, लवणीय क्षरण, काई जमना, दीवारों में दरारें।",
+        "kn": "ತೇವಾಂಶ ಹಾನಿ, ಉಪ್ಪಿನ ಕ್ಷಯ, ಅಲ್ಗಿ, ಗೋಡೆಗಳಲ್ಲಿ ಬಿರುಕುಗಳು.",
+        "or": "ଆର୍ଦ୍ରତା ହାନି, ଲବଣ କ୍ଷୟ, ଶୈବାଳ ବୃଦ୍ଧି, ଦିବାର ଭାଙ୍ଗିବା।"
+      },
+
+      "tts_text": {
+        "en": "Lokanatha Siva Temple is slowly decaying due to moisture and coastal salt air.",
+        "hi": "लोकनाथ शिव मंदिर नमी और समुद्री लवणता के कारण क्षतिग्रस्त हो रहा है।",
+        "kn": "ಲೋಕನಾಥ ಶಿವ ದೇವಾಲಯವು ತೇವಾಂಶ ಮತ್ತು ಸಮುದ್ರದ ಉಪ್ಪಿನಿಂದ ಹಾನಿಯಾಗುತ್ತಿದೆ.",
+        "or": "ଲୋକନାଥ ଶିବ ମନ୍ଦିର ଆର୍ଦ୍ରତା ଓ ସମୁଦ୍ର ଲବଣ ଯୋଗୁଁ କ୍ଷୟ ହେଉଛି।"
+      },
+
+      "image": "images/lokanatha.jpg"
+    },
+
+    {
+      "id": "sisupalgarh",
+      "title": {
+        "en": "Sisupalgarh Fort City",
+        "hi": "सिसुपालगढ़ प्राचीन नगर",
+        "kn": "ಸಿಸುಪಾಲಗಢ ಪುರಾತನ ನಗರ",
+        "or": "ସିସୁପାଲଗଡ଼ ପୁରାତନ ସହର"
+      },
+      "category": "forgotten_heritage",
+      "threat_level": "red",
+
+      "description": {
+        "en": "Sisupalgarh is one of India's oldest planned fort cities. Today it is threatened by urban encroachment and loss of archaeological remains.",
+        "hi": "सिसुपालगढ़ भारत के सबसे पुराने नियोजित नगरों में से एक है। आज यह शहरी अतिक्रमण और अवशेषों के नुकसान के कारण खतरे में है।",
+        "kn": "ಸಿಸುಪಾಲಗಢವು ಭಾರತದ ಅತ್ಯಂತ ಹಳೆಯ ಯೋಜಿತ ನಗರಗಳಲ್ಲಿ ಒಂದಾಗಿದೆ. ಇಂದು ಇದು ನಗರ ಅತಿಕ್ರಮಣ ಮತ್ತು ಪುರಾತತ್ವ ನಾಶದಿಂದ ಅಪಾಯದಲ್ಲಿದೆ.",
+        "or": "ସିସୁପାଲଗଡ଼ ଭାରତର ସବୁଠୁ ପୁରୁଣା ଯୋଜିତ ଦୁର୍ଗନଗର ମଧ୍ୟରୁ ଗୋଟିଏ। ବର୍ତ୍ତମାନ ଏହା ଶହର ଅତିକ୍ରମଣ ଓ ପୁରାତତ୍ତ୍ୱ ନଷ୍ଟ ହେବାରେ ସଙ୍କଟରେ ପଡ଼ିଛି।"
+      },
+
+      "issues": {
+        "en": "Urban encroachment, illegal construction, fort wall loss, unprotected excavation.",
+        "hi": "शहरी अतिक्रमण, अवैध निर्माण, किले की दीवार का नुकसान, असुरक्षित खुदाई।",
+        "kn": "ನಗರ ಅತಿಕ್ರಮಣ, ಅನಧಿಕೃತ ನಿರ್ಮಾಣ, ಕೋಟೆ ಗೋಡೆಗಳ ನಾಶ, ರಕ್ಷಣೆ ಇಲ್ಲದ ಅಗೆತ.",
+        "or": "ଶହରୀ ଅତିକ୍ରମଣ, ଅବୈଧ ନିର୍ମାଣ, କୋଟ ଦିବାର ନଷ୍ଟ, ଅସୁରକ୍ଷିତ ଖନନ।"
+      },
+
+      "tts_text": {
+        "en": "Sisupalgarh is an ancient fortified city endangered by encroachment and archaeological loss.",
+        "hi": "सिसुपालगढ़ अतिक्रमण और पुरातात्विक क्षति के कारण संकटग्रस्त है।",
+        "kn": "ಸಿಸುಪಾಲಗಢವು ಅತಿಕ್ರಮಣ ಮತ್ತು ಪುರಾತತ್ವ ನಾಶದಿಂದ ಅಪಾಯದಲ್ಲಿದೆ.",
+        "or": "ସିସୁପାଲଗଡ଼ ଅତିକ୍ରମଣ ଓ ପୁରାତତ୍ତ୍ୱ ନଷ୍ଟ ଯୋଗୁଁ ସଙ୍କଟରେ।"
+      },
+
+      "image": "images/sisupalgarh.jpg"
+    }
+  ]
+}

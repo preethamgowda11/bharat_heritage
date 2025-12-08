@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Landmark, Gem, QrCode } from 'lucide-react';
+import { Landmark, Gem, QrCode, ShieldAlert } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -31,7 +31,7 @@ export default function Home() {
         <p className="mt-4 max-w-2xl text-lg md:text-xl text-slate-200 drop-shadow-md">
           {t('home_subtitle')}
         </p>
-        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
             <Link href="/sites">
               <Landmark className="mr-2 h-5 w-5" />
@@ -44,8 +44,14 @@ export default function Home() {
               {t('discover_artifacts')}
             </Link>
           </Button>
+           <Button asChild size="lg" variant="destructive">
+            <Link href="/lost-india">
+              <ShieldAlert className="mr-2 h-5 w-5" />
+              {t('lost_india_title')}
+            </Link>
+          </Button>
           <Button asChild size="lg" variant="outline" className="bg-background/80 text-foreground">
-            <Link href="/ar-sculptures/sample-addon/viewer.html" target="_blank" rel="noopener noreferrer">
+            <Link href="/qr-scanner">
               <QrCode className="mr-2 h-5 w-5" />
               Scan & Learn
             </Link>

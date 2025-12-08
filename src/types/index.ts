@@ -35,3 +35,18 @@ export interface UserPreferences {
   isBionicReading?: boolean;
   isDyslexiaFont?: boolean;
 }
+
+export interface LostSite {
+    id: string;
+    title: Record<Language, string>;
+    category: 'endangered' | 'exaggerated_mythology' | 'forgotten_heritage';
+    threat_level: 'red' | 'yellow' | 'green';
+    description: Record<Language, string>;
+    issues?: Record<Language, string>;
+    myth_vs_fact?: {
+        myth: Record<Language, string>;
+        fact: Record<Language, string>;
+    };
+    tts_text: Record<Language, string>;
+    image: string;
+}

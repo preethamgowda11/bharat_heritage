@@ -209,6 +209,30 @@
       "description": "360 fallback image for Sanchi Stupa",
       "imageUrl": "https://images.unsplash.com/photo-1530258614483-0185dc8d6632?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHwzNjAlMjBwYW5vcmFtYXxlbnwwfHx8fDE3NjQzMTc4MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "360 panorama"
+    },
+    {
+      "id": "lost-india-hampi",
+      "description": "Image of Hampi for Lost India page",
+      "imageUrl": "/images/hampi.jpg",
+      "imageHint": "hampi endangered"
+    },
+    {
+      "id": "lost-india-dwarka",
+      "description": "Image of Dwarka Underwater City for Lost India page",
+      "imageUrl": "/images/dwarka.jpg",
+      "imageHint": "dwarka underwater"
+    },
+    {
+      "id": "lost-india-lokanatha",
+      "description": "Image of Lokanatha Siva Temple for Lost India page",
+      "imageUrl": "/images/lokanatha.jpg",
+      "imageHint": "lokanatha temple"
+    },
+    {
+      "id": "lost-india-sisupalgarh",
+      "description": "Image of Sisupalgarh Fort City for Lost India page",
+      "imageUrl": "/images/sisupalgarh.jpg",
+      "imageHint": "sisupalgarh fort"
     }
   ]
 }
