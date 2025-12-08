@@ -15,6 +15,7 @@ import { useTts } from '@/hooks/use-tts';
 import { ModelViewer } from '@/components/common/ModelViewer';
 import { BionicReading } from '@/components/common/BionicReading';
 import { Separator } from '../ui/separator';
+import NearbyPlaces from './NearbyPlaces';
 
 interface SiteDetailViewProps {
   site: Site;
@@ -128,6 +129,13 @@ export function SiteDetailView({ site }: SiteDetailViewProps) {
       <article className="prose prose-lg max-w-none mx-auto text-foreground/90 mb-6">
         <BionicReading text={longDescription} as="p" className="detail-description" />
       </article>
+
+      {site.lat && site.lon && (
+        <>
+          <Separator className="my-12" />
+          <NearbyPlaces lat={site.lat} lon={site.lon} radius={5000} />
+        </>
+      )}
       
       {site.artifacts.length > 0 && (
         <div className="mt-12">

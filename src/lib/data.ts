@@ -1,6 +1,7 @@
 
 import type { Site, Artifact, LostSite } from '@/types';
 import lostIndiaData from './lost-india-data.json';
+import siteCoordinatesData from './site-coordinates.json';
 
 const allArtifacts: Artifact[] = [
   {
@@ -146,7 +147,8 @@ const allArtifacts: Artifact[] = [
   },
 ];
 
-const allSites: Site[] = [
+const allSites: Site[] = siteCoordinatesData.siteCoordinates.map(coord => {
+  const siteData = [
   {
     id: 'site-1',
     title: {
@@ -395,7 +397,16 @@ const allSites: Site[] = [
     fallback360UrlId: 'fallback-360-sanchi-stupa',
     artifacts: allArtifacts.filter((a) => a.siteId === 'site-10'),
   },
-];
+].find(s => s.id === coord.id);
+
+  if (!siteData) return null;
+
+  return {
+    ...siteData,
+    lat: coord.lat,
+    lon: coord.lon,
+  };
+}).filter(Boolean) as Site[];
 
 export const getSites = (): Site[] => allSites;
 

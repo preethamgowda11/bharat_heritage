@@ -12,6 +12,8 @@ export interface Site {
   fallback360UrlId: string;
   artifacts: Artifact[];
   arLink?: string;
+  lat?: number;
+  lon?: number;
 }
 
 export interface Artifact {
