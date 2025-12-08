@@ -3,9 +3,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { Language } from '@/types';
+import * as googleTTS from 'google-tts-api';
 
 interface TTSResult {
-  url: string;
+  base64: string;
   shortText: string;
 }
 
@@ -23,18 +24,20 @@ export function useTts() {
   const playlistRef = useRef<string[]>([]);
   const currentTrackIndexRef = useRef(0);
 
-  // Initialize audio element
   useEffect(() => {
     if (typeof window !== 'undefined') {
       audioRef.current = new Audio();
       
       const handleEnded = () => {
-        // Play next track if available
         if (currentTrackIndexRef.current < playlistRef.current.length - 1) {
           currentTrackIndexRef.current++;
           if (audioRef.current) {
             audioRef.current.src = playlistRef.current[currentTrackIndexRef.current];
-            audioRef.current.play().catch(e => console.error("Playback error", e));
+            audioRef.current.play().catch(e => {
+              console.error("Playback error", e);
+              setIsSpeaking(false);
+              toast({ variant: 'destructive', title: UI_TEXT.error, description: "Could not play the next audio segment." });
+            });
           }
         } else {
           setIsSpeaking(false);
@@ -77,26 +80,18 @@ export function useTts() {
       return;
     }
     
-    stop(); // Stop any current playback
+    stop();
     setIsSpeaking(true);
     toast({ title: UI_TEXT.loading });
 
     try {
-      const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, lang }),
+      const results: TTSResult[] = await googleTTS.getAllAudioBase64(text, {
+        lang: lang,
+        slow: false,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch audio');
-      }
-
-      const data = await response.json();
-      const results: TTSResult[] = data.results;
-
       if (results && results.length > 0) {
-        playlistRef.current = results.map(r => r.url);
+        playlistRef.current = results.map(r => `data:audio/mp3;base64,${r.base64}`);
         currentTrackIndexRef.current = 0;
         
         if (audioRef.current) {
@@ -108,16 +103,16 @@ export function useTts() {
             .catch(e => {
               console.error("Playback start error", e);
               setIsSpeaking(false);
-              toast({ variant: 'destructive', title: UI_TEXT.error });
+              toast({ variant: 'destructive', title: UI_TEXT.error, description: "Could not start audio playback." });
             });
         }
       } else {
-        throw new Error('No audio URLs returned');
+        throw new Error('No audio data returned from TTS service');
       }
-    } catch (error) {
-      console.error('TTS Error:', error);
+    } catch (error: any) {
+      console.error('TTS Client-side Error:', error);
       setIsSpeaking(false);
-      toast({ variant: 'destructive', title: UI_TEXT.error });
+      toast({ variant: 'destructive', title: 'TTS Generation Failed', description: error.message || 'Please try again later.' });
     }
   }, [stop, toast]);
 
