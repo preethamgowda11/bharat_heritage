@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AlertTriangle, Info, EyeOff } from 'lucide-react';
 
 interface LostSiteCardProps {
@@ -53,9 +52,7 @@ const threatLevelMap: Record<string, { className: string; label: string }> = {
 
 export function LostSiteCard({ site }: LostSiteCardProps) {
   const { language, t } = useTranslation();
-  const image = PlaceHolderImages.find((p) => p.id === `lost-india-${site.id}`);
   const categoryInfo = categoryMap[site.category] || categoryMap.forgotten_heritage;
-
   const threat = threatLevelMap[site.threat_level];
 
   return (
@@ -68,9 +65,9 @@ export function LostSiteCard({ site }: LostSiteCardProps) {
           </Badge>
         </div>
         <div className="relative aspect-video">
-          {image ? (
+          {site.image ? (
             <Image
-              src={image.imageUrl}
+              src={site.image}
               alt={`Image of ${site.title.en}`}
               fill
               className="object-cover"
