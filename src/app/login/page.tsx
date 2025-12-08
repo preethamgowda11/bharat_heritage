@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth, useUser, initiateEmailSignIn, initiateAnonymousSignIn } from '@/firebase';
+import { useAuth, initiateEmailSignIn, initiateAnonymousSignIn } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { useUser } from '@/firebase';
 import { useAdmin } from '@/hooks/use-admin';
 
 export default function LoginPage() {
@@ -24,13 +24,14 @@ export default function LoginPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
-    // If auth state is resolved and user is confirmed admin, redirect from login page.
+    // If the initial auth check is done and the user is an admin,
+    // they shouldn't be on the login page, so redirect them.
     if (!isUserLoading && !isAdminLoading && user && isAdmin) {
         router.push('/admin/dashboard');
     }
   }, [user, isUserLoading, isAdmin, isAdminLoading, router]);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
         toast({
@@ -42,74 +43,63 @@ export default function LoginPage() {
     }
     setIsSigningIn(true);
 
-    const unsubscribe = onAuthStateChanged(auth, async (loggedInUser) => {
-        if (loggedInUser) {
-            unsubscribe(); // Clean up the listener immediately
-            try {
-                const idTokenResult = await loggedInUser.getIdTokenResult();
-                const isUserAdmin = idTokenResult.claims.admin === true;
+    try {
+      await initiateEmailSignIn(auth, email, password);
+      // The `onAuthStateChanged` listener in the `useUser` hook will handle the user state update.
+      // The `useEffect` on this page and the guard on the dashboard page will handle redirection.
+       toast({
+          title: 'Success',
+          description: 'You have been signed in. Redirecting...',
+       });
+       // Force a redirect after successful sign-in attempt.
+       router.push('/admin/dashboard');
 
-                toast({
-                    title: 'Success',
-                    description: 'You have been signed in.',
-                });
-                
-                if (isUserAdmin) {
-                    router.push('/admin/dashboard');
-                } else {
-                    router.push('/'); // Redirect non-admins to home
-                }
-            } catch (error) {
-                console.error("Error getting user claims:", error);
-                toast({
-                  variant: 'destructive',
-                  title: 'Authentication Error',
-                  description: 'Could not verify user role.',
-                });
-                router.push('/');
-            } finally {
-                setIsSigningIn(false);
-            }
-        }
-    }, (error) => {
-        // This handles errors during the sign-in process itself
-        unsubscribe(); // Clean up on error
+    } catch (error: any) {
         toast({
             variant: 'destructive',
             title: 'Authentication Failed',
             description: error.message || 'Could not sign in. Please check your credentials.',
         });
+    } finally {
         setIsSigningIn(false);
-    });
-
-    // Initiate the sign-in. The listener above will catch the result.
-    initiateEmailSignIn(auth, email, password);
+    }
   };
   
-  const handleAnonymousSignIn = () => {
+  const handleAnonymousSignIn = async () => {
     setIsSigningIn(true);
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-            unsubscribe();
-            toast({
-                title: 'Signed in as Guest',
-                description: 'You are now signed in anonymously.',
-            });
-            router.push('/');
-            setIsSigningIn(false);
-        }
-    });
-    initiateAnonymousSignIn(auth);
+    try {
+        await initiateAnonymousSignIn(auth);
+        toast({
+            title: 'Signed in as Guest',
+            description: 'You are now signed in anonymously.',
+        });
+        router.push('/');
+    } catch (error: any) {
+         toast({
+            variant: 'destructive',
+            title: 'Guest Sign-In Failed',
+            description: error.message || 'Could not sign in as guest.',
+        });
+    } finally {
+        setIsSigningIn(false);
+    }
   };
 
   // While checking the initial auth state, show a loading indicator.
   // The useEffect will handle redirection if the user is already logged in and an admin.
-  if (isUserLoading || isAdminLoading || (user && isAdmin)) {
+  if (isUserLoading || isAdminLoading) {
     return (
         <div className="flex h-screen w-full items-center justify-center">
             <p>Loading...</p>
         </div>
     );
+  }
+  
+  // If user is logged in but not an admin, they should not be on the login page either.
+  // Redirect them to home. This handles cases where a non-admin navigates here manually.
+  if (user && !isAdmin) {
+      router.push('/');
+      return null;
   }
 
   return (
