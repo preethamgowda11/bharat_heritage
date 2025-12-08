@@ -146,6 +146,48 @@
       },
 
       "image": "images/sisupalgarh.jpg"
+    },
+    {
+      "id": "unakoti",
+      "title": {
+        "en": "Unakoti Rock Carvings",
+        "hi": "उनकोटी शिलाचित्र",
+        "kn": "ಉನಕೋಟಿ ಶಿಲಾಶಿಲ್ಪಗಳು",
+        "or": "ଉନକୋଟି ଶିଳା ଭସ୍ତ୍ର"
+      },
+      "category": "hidden_heritage",
+      "threat_level": "yellow",
+
+      "description": {
+        "en": "Unakoti in Tripura is an ancient site filled with massive rock carvings of Shiva and other deities. Carved on cliffs and forested hillsides, it remains one of India's most offbeat and forgotten heritage treasures.",
+        "hi": "त्रिपुरा का उनकोटी भगवान शिव और अन्य देवताओं की विशाल शिलाकृतियों से भरा एक प्राचीन स्थल है। यह भारत की सबसे अनदेखी और रहस्यमयी धरोहरों में से एक है।",
+        "kn": "ತ್ರಿಪುರಾದ ಉನಕೋಟಿ ಶಿವ ಮತ್ತು ಇತರ ದೇವರ ಭವ್ಯ ಶಿಲಾಶಿಲ್ಪಗಳಿಂದ ಕೂಡಿದ ಪುರಾತನ ತಾಣವಾಗಿದೆ. ಇದು ಭಾರತದ ಅತ್ಯಂತ ಅಪರೂಪದ ಮತ್ತು ಮರೆವಿನಲ್ಲಿ ಉಳಿದ ಪರಂಪರೆಗಳಲ್ಲಿ ಒಂದಾಗಿದೆ.",
+        "or": "ତ୍ରିପୁରାର ଉନକୋଟି ଏକ ପ୍ରାଚୀନ ସ୍ଥଳ ଯେଉଁଠାରେ ଶିବ ଏବଂ ଅନ୍ୟାନ୍ୟ ଦେବତାଙ୍କର ବିଶାଳ ଶିଳା ଖୋଦନ ମିଳେ। ଏହା ଭାରତର ସବୁଠାରୁ ଅପରିଚିତ ଏବଂ ଅବହେଳିତ ସ୍ଥାନମାନଙ୍କ ମଧ୍ୟରୁ ଗୋଟିଏ।"
+      },
+
+      "myth_vs_fact": {
+        "myth": {
+          "en": "A crore gods turned into stone here after disobeying Shiva.",
+          "hi": "किंवदंती के अनुसार यहां एक करोड़ देवता शिव के श्राप से पत्थर बन गए।",
+          "kn": "ಪೌರಾಣಿಕ ಕಥೆಯ ಪ್ರಕಾರ ಇಲ್ಲಿ ಒಂದು ಕೋಟಿ ದೇವರು ಶಿವನ ಶಾಪದಿಂದ ಕಲ್ಲಾಗಿ ಮಾರ್ಪಟ್ಟರು.",
+          "or": "ପୌରାଣିକ କହାଣୀ ଅନୁସାରେ ଏଠାରେ ଏକ କୋଟି ଦେବତା ଶିବଙ୍କ ଶାପରେ ପଥର ହୋଇଗଲେ।"
+        },
+        "fact": {
+          "en": "Archaeologists believe the carvings date to the 7th–9th centuries but the site's full origins remain unclear.",
+          "hi": "पुरातत्वविदों के अनुसार यह स्थल 7वीं–9वीं शताब्दी का है, पर इसका वास्तविक इतिहास अब भी अस्पष्ट है।",
+          "kn": "ಪುರಾತತ್ವ ಅಧ್ಯಯನದ ಪ್ರಕಾರ ಇಲ್ಲಿ ಕಂಡುಬರುವ ಶಿಲಾಶಿಲ್ಪಗಳು 7ನೇ–9ನೇ ಶತಮಾನಗಳವರೆಗೆ ಸೇರಿದವು, ಆದರೆ ಸಂಪೂರ್ಣ ಇತಿಹಾಸ ಇನ್ನೂ ಅಸ್ಪಷ್ಟವಾಗಿದೆ.",
+          "or": "ପୁରାତତ୍ତ୍ୱବିଦ୍ମାନଙ୍କ ମତାନୁସାରେ ଏହି ଶିଳା ଭସ୍ତ୍ର 7ମ–9ମ ଶତାବ୍ଦୀର, କିନ୍ତୁ ସ୍ଥଳର ପୂର୍ଣ୍ଣ ଇତିହାସ ସ୍ପଷ୍ଟ ନୁହେଁ।"
+        }
+      },
+
+      "tts_text": {
+        "en": "Unakoti is a forgotten forest site in Tripura with giant rock carvings believed to be from the 7th to 9th century.",
+        "hi": "उनकोटी त्रिपुरा का एक भूला हुआ स्थल है, जहाँ विशाल प्राचीन शिलाकृतियाँ मिलती हैं।",
+        "kn": "ಉನಕೋಟಿ ತ್ರಿಪುರಾದಲ್ಲಿ ಇರುವ ಮರೆವಿನಲ್ಲಿ ಉಳಿದ ತಾಣವಾಗಿದ್ದು, ಇಲ್ಲಿ ಭವ್ಯ ಶಿಲಾಶಿಲ್ಪಗಳು ಕಾಣಿಸುತ್ತವೆ.",
+        "or": "ଉନକୋଟି ତ୍ରିପୁରାର ଗୋଟିଏ ଭୁଲାହୋଇଥିବା ସ୍ଥାନ ଯେଉଁଠାରେ ବିଶାଳ ପୁରାତନ ଶିଳା ଖୋଦନ ମିଳେ।"
+      },
+
+      "image": "images/unakoti.jpg"
     }
   ]
 }

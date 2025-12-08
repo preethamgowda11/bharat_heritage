@@ -13,7 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle, Info, EyeOff } from 'lucide-react';
 
 interface LostSiteCardProps {
   site: LostSite;
@@ -38,6 +38,11 @@ const categoryMap: Record<
     className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     icon: <Info className="h-3 w-3" />,
   },
+  hidden_heritage: {
+    label: 'Hidden',
+    className: 'bg-purple-100 text-purple-800 border-purple-200',
+    icon: <EyeOff className="h-3 w-3" />,
+  }
 };
 
 const threatLevelMap: Record<string, { className: string; label: string }> = {
@@ -48,7 +53,7 @@ const threatLevelMap: Record<string, { className: string; label: string }> = {
 
 export function LostSiteCard({ site }: LostSiteCardProps) {
   const { language, t } = useTranslation();
-  const image = PlaceHolderImages.find((p) => p.imageUrl === `/${site.image}`);
+  const image = PlaceHolderImages.find((p) => p.id === `lost-india-${site.id}`);
   const categoryInfo = categoryMap[site.category] || categoryMap.forgotten_heritage;
 
   const threat = threatLevelMap[site.threat_level];

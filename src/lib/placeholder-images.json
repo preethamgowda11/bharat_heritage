@@ -233,6 +233,12 @@
       "description": "Image of Sisupalgarh Fort City for Lost India page",
       "imageUrl": "/images/sisupalgarh.jpg",
       "imageHint": "sisupalgarh fort"
+    },
+    {
+      "id": "lost-india-unakoti",
+      "description": "Image of Unakoti Rock Carvings for Lost India page",
+      "imageUrl": "/images/unakoti.jpg",
+      "imageHint": "unakoti carvings"
     }
   ]
 }

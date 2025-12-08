@@ -39,7 +39,7 @@ export interface UserPreferences {
 export interface LostSite {
     id: string;
     title: Record<Language, string>;
-    category: 'endangered' | 'exaggerated_mythology' | 'forgotten_heritage';
+    category: 'endangered' | 'exaggerated_mythology' | 'forgotten_heritage' | 'hidden_heritage';
     threat_level: 'red' | 'yellow' | 'green';
     description: Record<Language, string>;
     issues?: Record<Language, string>;
