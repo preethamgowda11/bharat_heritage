@@ -97,10 +97,8 @@ export function SiteDetailView({ site }: SiteDetailViewProps) {
         )}
       </div>
 
-      <div className="text-center my-6 flex justify-center gap-4">
-      <div className="mr-2"> 
+      <div className="text-center my-6 flex justify-center items-center gap-4">
         <PlaceSuggestionForm siteId={site.id} lat={site.lat} lon={site.lon} onAfterSubmit={() => { /* optional: refresh nearby list */ }} />
-      </div>
 
         {modelUrl && (
           <Button variant="outline" onClick={handleToggle3DModel}>
