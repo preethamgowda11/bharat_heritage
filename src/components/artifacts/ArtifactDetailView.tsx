@@ -3,12 +3,10 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
 import type { Artifact } from '@/types';
 import { useUserPreferences } from '@/context/UserPreferencesContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Play, Pause, View, ImageIcon, MessageSquareQuote } from 'lucide-react';
-import { ModelViewer } from '@/components/common/ModelViewer';
+import { ArrowLeft, Play, Pause, View, MessageSquareQuote } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { useTts } from '@/hooks/use-tts';
 import { BionicReading } from '@/components/common/BionicReading';
@@ -23,7 +21,6 @@ export function ArtifactDetailView({ artifact }: ArtifactDetailViewProps) {
   const { isLowBandwidth, isAudioOn } = useUserPreferences();
   const { t, language } = useTranslation();
   const { speak, stop, isSpeaking } = useTts();
-  const [show3DModel, setShow3DModel] = useState(false);
 
   const title = artifact.title[language];
   const description = artifact.description[language];
@@ -36,12 +33,6 @@ export function ArtifactDetailView({ artifact }: ArtifactDetailViewProps) {
       stop();
     } else {
       speak(description, language);
-    }
-  };
-
-  const handleToggle3DModel = () => {
-    if (modelUrl) {
-      setShow3DModel(!show3DModel);
     }
   };
   
@@ -77,37 +68,15 @@ export function ArtifactDetailView({ artifact }: ArtifactDetailViewProps) {
       </div>
 
       <div className="relative w-full h-96 rounded-lg overflow-hidden mb-8 shadow-lg bg-muted">
-        {show3DModel && modelUrl ? (
-          <ModelViewer src={modelUrl} alt={`3D model of ${title}`} posterId={artifact.imageUrlId} ar={false} />
-        ) : (
-          image && (
-            <Image 
-              src={image.imageUrl} 
-              alt={`Image of ${title}`} 
-              fill 
-              className="object-cover" 
-              data-ai-hint={image.imageHint}
-              priority
-            />
-          )
-        )}
-      </div>
-
-       <div className="text-center my-6">
-        {modelUrl && (
-          <Button variant="outline" onClick={handleToggle3DModel}>
-            {show3DModel ? (
-                <>
-                  <ImageIcon className="mr-2 h-4 w-4" />
-                  Show Image
-                </>
-              ) : (
-                <>
-                  <View className="mr-2 h-4 w-4" />
-                  {t('show_3d_model')}
-                </>
-              )}
-          </Button>
+        {image && (
+          <Image 
+            src={image.imageUrl} 
+            alt={`Image of ${title}`} 
+            fill 
+            className="object-cover" 
+            data-ai-hint={image.imageHint}
+            priority
+          />
         )}
       </div>
 
