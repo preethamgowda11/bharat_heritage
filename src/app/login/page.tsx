@@ -27,6 +27,7 @@ export default function LoginPage() {
         title: 'Signed In',
         description: 'You have been successfully signed in.',
       });
+      // Directly redirect to the dashboard upon successful sign-in
       router.push('/admin/dashboard');
     } catch (error: any) {
       console.error("Sign-in error:", error);
