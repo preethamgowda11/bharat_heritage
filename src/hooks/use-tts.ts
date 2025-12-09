@@ -1,37 +1,24 @@
-
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Language } from '@/types';
+import { generateAudio } from '@/ai/tts-flow';
+import { useToast } from './use-toast';
 
-const MAX_CHUNK_LENGTH = 200; // Max characters per TTS chunk
-
-// Splits text into sentences without removing delimiters.
-const splitSentences = (text: string): string[] => {
+// Splits text into chunks. A simple split by sentence is often good,
+// but for very long texts, we might need a character limit.
+// This implementation splits by sentences for natural pauses.
+const splitIntoChunks = (text: string): string[] => {
   if (!text) return [];
-  // Split by periods, exclamation marks, and question marks, keeping the delimiter
-  return text.match(/[^.!?]+[.!?]*/g) || [text];
+  // Split by sentence-ending punctuation. The regex keeps the delimiters.
+  const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+  return sentences.map(s => s.trim()).filter(s => s.length > 0);
 };
-
-async function getAudio(text: string, lang: Language): Promise<string> {
-    const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, lang }),
-    });
-
-    if (!response.ok) {
-        const errorBody = await response.json();
-        throw new Error(errorBody.error || `TTS proxy request failed with status ${response.status}`);
-    }
-
-    const buffer = Buffer.from(await response.arrayBuffer());
-    return buffer.toString('base64');
-}
 
 
 export function useTts() {
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sentencesQueueRef = useRef<string[]>([]);
   const currentLangRef = useRef<Language>('en');
@@ -40,6 +27,7 @@ export function useTts() {
   const playNextSentence = useCallback(async () => {
     if (isStoppingRef.current) {
         setIsSpeaking(false);
+        isStoppingRef.current = false;
         return;
     }
     if (sentencesQueueRef.current.length === 0) {
@@ -47,6 +35,7 @@ export function useTts() {
       return;
     }
 
+    setIsSpeaking(true);
     const sentence = sentencesQueueRef.current.shift();
     if (!sentence) {
       setIsSpeaking(false);
@@ -54,26 +43,60 @@ export function useTts() {
     }
 
     try {
-      const lang = currentLangRef.current;
-      const base64Audio = await getAudio(sentence, lang);
+      const result = await generateAudio({ text: sentence, lang: currentLangRef.current });
+      const audioDataUrl = result.media;
 
-      if (isStoppingRef.current) return;
+      if (isStoppingRef.current) {
+          setIsSpeaking(false);
+          isStoppingRef.current = false;
+          return;
+      };
 
       if (!audioRef.current) {
         audioRef.current = new Audio();
         audioRef.current.onended = playNextSentence;
+        audioRef.current.onerror = () => {
+            console.error('Audio playback error');
+            toast({
+                variant: 'destructive',
+                title: 'Playback Error',
+                description: 'Could not play the generated audio.',
+            });
+            playNextSentence(); // Try next sentence
+        }
       }
-      
-      audioRef.current.src = `data:audio/mp3;base64,${base64Audio}`;
+
+      audioRef.current.src = audioDataUrl;
       await audioRef.current.play();
-      setIsSpeaking(true);
 
     } catch (error) {
       console.error('TTS generation failed for sentence:', sentence, error);
+      toast({
+        variant: 'destructive',
+        title: 'TTS Error',
+        description: 'Could not generate audio for the selected text.',
+      });
       // Try to play the next sentence even if one fails
       playNextSentence();
     }
-  }, []);
+  }, [toast]);
+
+  const speak = useCallback((text: string, lang: Language) => {
+      if (isSpeaking) {
+        stop();
+        return;
+      }
+
+      isStoppingRef.current = false;
+      currentLangRef.current = lang;
+      
+      const chunks = splitIntoChunks(text);
+      sentencesQueueRef.current = chunks;
+
+      if (sentencesQueueRef.current.length > 0) {
+        playNextSentence();
+      }
+    }, [isSpeaking, playNextSentence, stop]);
 
   const stop = useCallback(() => {
     isStoppingRef.current = true;
@@ -84,32 +107,6 @@ export function useTts() {
     }
     setIsSpeaking(false);
   }, []);
-  
-  const speak = useCallback((text: string, lang: Language) => {
-      if (isSpeaking) {
-        stop();
-        return;
-      }
-
-      isStoppingRef.current = false;
-      currentLangRef.current = lang;
-
-      const rawSentences = splitSentences(text);
-      const processedChunks: string[] = [];
-
-      rawSentences.forEach(sentence => {
-          if (sentence.length > MAX_CHUNK_LENGTH) {
-              for (let i = 0; i < sentence.length; i += MAX_CHUNK_LENGTH) {
-                  processedChunks.push(sentence.substring(i, i + MAX_CHUNK_LENGTH));
-              }
-          } else {
-              processedChunks.push(sentence);
-          }
-      });
-      
-      sentencesQueueRef.current = processedChunks;
-      playNextSentence();
-    }, [isSpeaking, playNextSentence, stop]);
   
   // Cleanup on unmount
   useEffect(() => {
