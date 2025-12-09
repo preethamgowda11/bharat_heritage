@@ -55,43 +55,6 @@ export default function DangerCheckPage() {
       }
     };
   }, [toast]);
-
-  const handleDangerCheck = async () => {
-    if (!videoRef.current) {
-      toast({ variant: 'destructive', title: 'Camera not ready' });
-      return;
-    }
-    setIsChecking(true);
-    try {
-      const canvas = document.createElement('canvas');
-      canvas.width = 640;
-      canvas.height = 480;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-        const res = await runDangerCheck(dataUrl);
-
-        if (res && res.result && res.result.predictions && res.result.predictions.length > 0) {
-            const topPrediction = res.result.predictions[0];
-            setResult({ score: topPrediction.confidence, label: topPrediction.class });
-            setShowResultDialog(true);
-        } else {
-            toast({ title: 'Analysis Complete', description: 'No specific threats were detected in the image.' });
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to run danger check. Please try again.',
-      });
-    } finally {
-      setIsChecking(false);
-    }
-  };
   
   const getRiskLevel = (score: number | null) => {
     if (score === null) return { text: 'Unknown', color: 'text-gray-500' };
@@ -128,14 +91,6 @@ export default function DangerCheckPage() {
               <Button variant="secondary" onClick={() => router.back()}>
                 Back
               </Button>
-            </div>
-            
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
-                <Button size="lg" className="h-16 w-16 rounded-full" onClick={handleDangerCheck} disabled={isChecking}>
-                    {isChecking ? <Loader className="animate-spin" /> : <Camera size={32}/>}
-                    <span className="sr-only">Scan for Danger</span>
-                </Button>
-                <p className="text-center text-white/90 text-sm mt-2 font-semibold bg-black/30 rounded-md px-2 py-1">Tap to Scan</p>
             </div>
          </>
       )}
