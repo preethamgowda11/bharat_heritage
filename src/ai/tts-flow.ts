@@ -56,9 +56,6 @@ const generateAudioFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            // The voiceName here is just a placeholder, as language-specific
-            // voices are often chosen automatically based on text language.
-            // For more control, one might map `lang` to specific voice names.
             prebuiltVoiceConfig: { voiceName: voiceMap[lang] || 'Algenib' },
           },
         },
