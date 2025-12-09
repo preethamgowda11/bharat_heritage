@@ -82,7 +82,7 @@ export function useTts() {
       // Try to play the next sentence even if one fails
       playNextSentence();
     }
-  }, [playNextSentence]);
+  }, []);
 
   const speak = useCallback((text: string, lang: Language) => {
       if (isSpeaking) {
