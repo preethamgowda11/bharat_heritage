@@ -56,6 +56,7 @@ const generateAudioFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
+            // Use the mapped voice or a default if not found. 'Algenib' is a generic good-quality voice.
             prebuiltVoiceConfig: { voiceName: voiceMap[lang] || 'Algenib' },
           },
         },

@@ -4,6 +4,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Language } from '@/types';
 import { useToast } from './use-toast';
+import { generateAudio } from '@/ai/tts-flow';
 
 // Splits text into chunks. A simple split by sentence is often good,
 // but for very long texts, we might need a character limit.
@@ -52,19 +53,7 @@ export function useTts() {
     }
 
     try {
-      // Always call our internal API route
-      const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: sentence, lang: currentLangRef.current }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'TTS service failed');
-      }
-
-      const { audioDataUrl } = await response.json();
+      const { media: audioDataUrl } = await generateAudio({ text: sentence, lang: currentLangRef.current });
 
       if (isStoppingRef.current) {
           setIsSpeaking(false);
@@ -75,8 +64,8 @@ export function useTts() {
       if (!audioRef.current) {
         audioRef.current = new Audio();
         audioRef.current.onended = playNextSentence;
-        audioRef.current.onerror = () => {
-            console.error('Audio playback error');
+        audioRef.current.onerror = (e) => {
+            console.error('Audio playback error', e);
             toast({
                 variant: 'destructive',
                 title: 'Playback Error',
