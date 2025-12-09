@@ -4,14 +4,9 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Language } from '@/types';
 import { useToast } from './use-toast';
-import { generateAudio } from '@/ai/tts-flow';
 
-// Splits text into chunks. A simple split by sentence is often good,
-// but for very long texts, we might need a character limit.
-// This implementation splits by sentences for natural pauses.
 const splitIntoChunks = (text: string): string[] => {
   if (!text) return [];
-  // Split by sentence-ending punctuation. The regex keeps the delimiters.
   const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
   return sentences.map(s => s.trim()).filter(s => s.length > 0);
 };
@@ -29,16 +24,16 @@ export function useTts() {
     sentencesQueueRef.current = [];
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.src = ""; // Clear the audio source
+      audioRef.current.src = "";
     }
     setIsSpeaking(false);
   }, []);
 
   const playNextSentence = useCallback(async () => {
     if (isStoppingRef.current) {
-        setIsSpeaking(false);
-        isStoppingRef.current = false;
-        return;
+      setIsSpeaking(false);
+      isStoppingRef.current = false;
+      return;
     }
     if (sentencesQueueRef.current.length === 0) {
       setIsSpeaking(false);
@@ -53,26 +48,37 @@ export function useTts() {
     }
 
     try {
-      const { media: audioDataUrl } = await generateAudio({ text: sentence, lang: currentLangRef.current });
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sentence, lang: currentLangRef.current }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch audio');
+      }
+
+      const { media: audioDataUrl } = await response.json();
 
       if (isStoppingRef.current) {
-          setIsSpeaking(false);
-          isStoppingRef.current = false;
-          return;
-      };
+        setIsSpeaking(false);
+        isStoppingRef.current = false;
+        return;
+      }
 
       if (!audioRef.current) {
         audioRef.current = new Audio();
         audioRef.current.onended = playNextSentence;
         audioRef.current.onerror = (e) => {
-            console.error('Audio playback error', e);
-            toast({
-                variant: 'destructive',
-                title: 'Playback Error',
-                description: 'Could not play the generated audio.',
-            });
-            playNextSentence(); // Try next sentence
-        }
+          console.error('Audio playback error', e);
+          toast({
+            variant: 'destructive',
+            title: 'Playback Error',
+            description: 'Could not play the generated audio.',
+          });
+          playNextSentence();
+        };
       }
 
       audioRef.current.src = audioDataUrl;
@@ -80,34 +86,32 @@ export function useTts() {
 
     } catch (error: any) {
       console.error('TTS generation failed for sentence:', sentence, error);
-       toast({
+      toast({
         variant: 'destructive',
         title: 'TTS Error',
         description: error.message || 'Could not generate audio for the selected text.',
       });
-      // Try to play the next sentence even if one fails
       playNextSentence();
     }
   }, [toast]);
   
   const speak = useCallback((text: string, lang: Language) => {
-      if (isSpeaking) {
-        stop();
-        return;
-      }
+    if (isSpeaking) {
+      stop();
+      return;
+    }
 
-      isStoppingRef.current = false;
-      currentLangRef.current = lang;
-      
-      const chunks = splitIntoChunks(text);
-      sentencesQueueRef.current = chunks;
+    isStoppingRef.current = false;
+    currentLangRef.current = lang;
+    
+    const chunks = splitIntoChunks(text);
+    sentencesQueueRef.current = chunks;
 
-      if (sentencesQueueRef.current.length > 0) {
-        playNextSentence();
-      }
-    }, [isSpeaking, playNextSentence, stop]);
+    if (sentencesQueueRef.current.length > 0) {
+      playNextSentence();
+    }
+  }, [isSpeaking, playNextSentence, stop]);
   
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       stop();

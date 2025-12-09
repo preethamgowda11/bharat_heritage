@@ -4,12 +4,11 @@ import * as googleTTS from 'google-tts-api';
 
 const ANUVADINI_API_URL = 'https://pre-alpha.anuvadini.ai4bharat.org/v0/translate_speech';
 
-// Function to handle TTS requests to the Anuvadini service
 async function getAnuvadiniAudio(text: string, lang: 'kn' | 'or'): Promise<string | null> {
     try {
         const payload = {
             "inputText": text,
-            "gender": "female" // as per the config's voice choice
+            "gender": "female"
         };
 
         const response = await fetch(`${ANUVADINI_API_URL}?source_language=${lang}&target_language=${lang}`, {
@@ -30,7 +29,6 @@ async function getAnuvadiniAudio(text: string, lang: 'kn' | 'or'): Promise<strin
 
         const result = await response.json();
         
-        // The Anuvadini response for TTS contains the audio in pipelineResponse.pipelineResponse[0].audio[0].audioContent
         if (result?.pipelineResponse?.pipelineResponse?.[0]?.audio?.[0]?.audioContent) {
             return result.pipelineResponse.pipelineResponse[0].audio[0].audioContent;
         } else {
@@ -44,8 +42,6 @@ async function getAnuvadiniAudio(text: string, lang: 'kn' | 'or'): Promise<strin
     }
 }
 
-
-// Main API handler
 export async function POST(req: NextRequest) {
     try {
         const { text, lang } = await req.json();
@@ -56,11 +52,9 @@ export async function POST(req: NextRequest) {
 
         let audioBase64: string | null = null;
 
-        // Route to the correct TTS provider based on language
         if (lang === 'or' || lang === 'kn') {
              audioBase64 = await getAnuvadiniAudio(text, lang);
         } else {
-            // Use Google TTS for English and Hindi
             audioBase64 = await googleTTS.getAudioBase64(text, { lang, slow: false });
         }
 
