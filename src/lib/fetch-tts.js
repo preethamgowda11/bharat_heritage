@@ -1,4 +1,4 @@
-console.error("Script started");
+
 const https = require('https');
 
 // Custom text splitter
@@ -33,7 +33,11 @@ function splitText(text, maxLength = 100) {
 
 function fetchUrl(url) {
     return new Promise((resolve, reject) => {
-        const req = https.get(url, (res) => {
+        const req = https.get(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
+          }
+        }, (res) => {
             if (res.statusCode !== 200) {
                 res.resume(); // Consume response data to free up memory
                 return reject(new Error(`Status Code: ${res.statusCode}`));
@@ -61,18 +65,12 @@ async function fetchTTS() {
     }
 
     try {
-        console.error("Warming up connection...");
-        try {
-            await fetchUrl('https://translate.google.com/translate_tts?ie=UTF-8&q=a&tl=en&client=gtx');
-        } catch (e) {
-            console.error("Warm-up failed (ignoring):", e.message);
-        }
+        const chunks = splitText(text, 180); 
         
-        await new Promise(r => setTimeout(r, 500));
-
-        console.error("Splitting text...");
-        const chunks = splitText(text, 30); 
-        console.error(`Text split into ${chunks.length} chunks.`);
+        if (chunks.length === 0) {
+            console.log('');
+            return;
+        }
 
         const buffers = [];
         
@@ -81,36 +79,28 @@ async function fetchTTS() {
             if (!chunk.trim()) continue;
             
             const encoded = encodeURIComponent(chunk);
-            // client=webapp seems to work for Odia where gtx/tw-ob fail
-            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=${lang}&client=webapp`;
-            
-            console.error(`Fetching chunk ${i+1}/${chunks.length}: "${chunk.substring(0, 10)}...`);
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=${lang}&client=tw-ob`;
             
             try {
                 const buffer = await fetchUrl(url);
                 buffers.push(buffer);
             } catch (err) {
                 console.error(`Failed Chunk ${i}:`, err.message);
-                // Retry once
-                await new Promise(r => setTimeout(r, 2000));
-                try {
-                    const buffer = await fetchUrl(url);
-                    buffers.push(buffer);
-                } catch (retryErr) {
-                    console.error(`Retry failed for chunk ${i}:`, retryErr.message);
-                    throw retryErr;
-                }
+                // Don't retry, just fail fast if the service is down.
+                throw err;
             }
             
-            const randomDelay = Math.floor(Math.random() * 500) + 200;
+            // Avoid being too aggressive
+            const randomDelay = Math.floor(Math.random() * 300) + 150;
             await new Promise(r => setTimeout(r, randomDelay));
         }
 
         const finalBuffer = Buffer.concat(buffers);
-        console.log(finalBuffer.toString('base64'));
+        // Write base64 to stdout for the parent process
+        process.stdout.write(finalBuffer.toString('base64'));
 
     } catch (error) {
-        console.error(error.message);
+        console.error('TTS Script Error:', error.message);
         process.exit(1);
     }
 }
