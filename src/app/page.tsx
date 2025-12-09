@@ -72,13 +72,13 @@ export default function Home() {
                 {t('lost_india_title')}
               </Link>
             </Button>
-            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
                <a href='/ar-sculptures/sample-addon/viewer.html' target='_blank' rel='noopener noreferrer' className='flex items-center'>
                 <ScanLine className="mr-2 h-5 w-5" />
                 Scan & Learn
               </a>
             </Button>
-            <Button asChild size="lg" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+            <Button asChild size="lg" variant="destructive">
               <Link href="/danger-check">
                 <ShieldAlert className="mr-2 h-5 w-5" />
                 Heritage Alert
