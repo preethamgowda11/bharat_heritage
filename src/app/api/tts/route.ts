@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     }
 
     // Correctly resolve the path to the script within the project structure.
-    const scriptPath = path.resolve('./src/lib/fetch-tts.js');
+    const scriptPath = path.join(process.cwd(), 'src', 'lib', 'fetch-tts.js');
 
     const ttsProcess = spawn('node', [scriptPath, text, lang]);
 
