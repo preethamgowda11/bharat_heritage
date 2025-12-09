@@ -5,6 +5,7 @@ export type Language = 'en' | 'hi' | 'kn' | 'or';
 export interface SiteEvent {
   date: string; // YYYY-MM-DD
   name: Record<Language, string>;
+  emoji?: string;
 }
 
 export interface Site {
