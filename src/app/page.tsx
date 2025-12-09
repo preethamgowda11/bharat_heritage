@@ -54,32 +54,32 @@ export default function Home() {
           <p className="mt-4 max-w-2xl text-lg md:text-xl text-slate-200 drop-shadow-md">
             {t('home_subtitle')}
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl px-4">
+            <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link href="/sites">
                 <Landmark className="mr-2 h-5 w-5" />
                 {t('explore_sites')}
               </Link>
             </Button>
-            <Button asChild size="lg" variant="secondary">
+            <Button asChild size="lg" variant="secondary" className="w-full">
               <Link href="/artifacts">
                 <Gem className="mr-2 h-5 w-5" />
                 {t('discover_artifacts')}
               </Link>
             </Button>
-            <Button asChild size="lg" variant="secondary">
+            <Button asChild size="lg" variant="secondary" className="w-full">
               <Link href="/lost-india">
                 <ShieldAlert className="mr-2 h-5 w-5" />
                 {t('lost_india_title')}
               </Link>
             </Button>
-            <Button asChild size="lg" variant="secondary">
-               <a href='/ar-sculptures/sample-addon/viewer.html' target='_blank' rel='noopener noreferrer' className='flex items-center'>
+            <Button asChild size="lg" variant="secondary" className="w-full">
+               <a href='/ar-sculptures/sample-addon/viewer.html' target='_blank' rel='noopener noreferrer' className='flex items-center justify-center'>
                 <ScanLine className="mr-2 h-5 w-5" />
                 Scan & Learn
               </a>
             </Button>
-            <Button asChild size="lg" variant="secondary">
+            <Button asChild size="lg" variant="secondary" className="w-full">
               <Link href="/danger-check">
                 <ShieldAlert className="mr-2 h-5 w-5" />
                 Heritage Alert
