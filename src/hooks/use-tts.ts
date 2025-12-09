@@ -43,36 +43,21 @@ async function getGoogleTtsAudio(text: string, lang: Language): Promise<string> 
     return buffer.toString('base64');
 }
 
-// Fetches audio from the Anuvadini AI endpoint
-async function getAnuvadiniTtsAudio(text: string): Promise<string> {
-    const ANUVADINI_URL = 'https://pre-prod-api.anuvadini.gov.in/v2/master-pipeline';
-    const payload = {
-        "input": [ { "source": text } ],
-        "config": {
-            "serviceId": "ai4b-or-tts",
-            "language": { "sourceLanguage": "or" }
-        }
-    };
-    
-    const response = await fetch(ANUVADINI_URL, {
+// Fetches audio from our internal Anuvadini proxy
+async function getAnuvadiniProxyAudio(text: string): Promise<string> {
+    const response = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ text, lang: 'or' }),
     });
 
     if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(`Anuvadini TTS request failed: ${errorBody}`);
+        const errorBody = await response.json();
+        throw new Error(errorBody.error || `Anuvadini proxy request failed with status ${response.status}`);
     }
 
-    const result = await response.json();
-    const audioContent = result?.pipelineResponse?.[0]?.audio?.[0]?.audioContent;
-
-    if (!audioContent) {
-        throw new Error('Anuvadini TTS response did not contain audio content.');
-    }
-    
-    return audioContent; // It's already base64
+    const buffer = Buffer.from(await response.arrayBuffer());
+    return buffer.toString('base64');
 }
 
 
@@ -102,7 +87,7 @@ export function useTts() {
     try {
       const lang = currentLangRef.current;
       const base64Audio = lang === 'or' 
-        ? await getAnuvadiniTtsAudio(sentence)
+        ? await getAnuvadiniProxyAudio(sentence)
         : await getGoogleTtsAudio(sentence, lang);
 
       if (isStoppingRef.current) return;

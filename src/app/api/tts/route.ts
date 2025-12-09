@@ -1,60 +1,68 @@
-{
-  "name": "nextn",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack -p 9002",
-    "build": "NODE_ENV=production next build",
-    "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@hookform/resolvers": "^4.1.3",
-    "@radix-ui/react-accordion": "^1.2.3",
-    "@radix-ui/react-alert-dialog": "^1.1.6",
-    "@radix-ui/react-avatar": "^1.1.3",
-    "@radix-ui/react-checkbox": "^1.1.4",
-    "@radix-ui/react-collapsible": "^1.1.11",
-    "@radix-ui/react-dialog": "^1.1.6",
-    "@radix-ui/react-dropdown-menu": "^2.1.6",
-    "@radix-ui/react-label": "^2.1.2",
-    "@radix-ui/react-menubar": "^1.1.6",
-    "@radix-ui/react-popover": "^1.1.6",
-    "@radix-ui/react-progress": "^1.1.2",
-    "@radix-ui/react-radio-group": "^1.2.3",
-    "@radix-ui/react-scroll-area": "^1.2.3",
-    "@radix-ui/react-select": "^2.1.6",
-    "@radix-ui/react-separator": "^1.1.2",
-    "@radix-ui/react-slider": "^1.2.3",
-    "@radix-ui/react-slot": "^1.2.3",
-    "@radix-ui/react-switch": "^1.1.3",
-    "@radix-ui/react-tabs": "^1.1.3",
-    "@radix-ui/react-toast": "^1.2.6",
-    "@radix-ui/react-tooltip": "^1.1.8",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "date-fns": "^3.6.0",
-    "embla-carousel-react": "^8.6.0",
-    "firebase": "^11.9.1",
-    "lucide-react": "^0.417.0",
-    "react": "^18.3.1",
-    "react-day-picker": "^8.10.1",
-    "react-dom": "^18.3.1",
-    "react-hook-form": "^7.54.2",
-    "recharts": "^2.15.1",
-    "tailwind-merge": "^3.0.1",
-    "tailwindcss-animate": "^1.0.7",
-    "three": "^0.165.0"
-  },
-  "devDependencies": {
-    "next": "15.3.3",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "@types/three": "^0.165.0",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+
+// src/app/api/tts/route.ts
+
+import { NextRequest, NextResponse } from 'next/server';
+
+async function getAnuvadiniTtsAudio(text: string): Promise<string> {
+    const ANUVADINI_URL = 'https://pre-prod-api.anuvadini.gov.in/v2/master-pipeline';
+    const payload = {
+        "input": [ { "source": text } ],
+        "config": {
+            "serviceId": "ai4b-or-tts",
+            "language": { "sourceLanguage": "or" }
+        }
+    };
+    
+    const response = await fetch(ANUVADINI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.text();
+        console.error("Anuvadini TTS Error:", errorBody);
+        throw new Error(`Anuvadini TTS request failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    const audioContent = result?.pipelineResponse?.[0]?.audio?.[0]?.audioContent;
+
+    if (!audioContent) {
+        throw new Error('Anuvadini TTS response did not contain audio content.');
+    }
+    
+    return audioContent; // It's already base64
+}
+
+
+export async function POST(req: NextRequest) {
+  try {
+    const { text, lang } = await req.json();
+
+    if (!text || !lang) {
+      return NextResponse.json({ error: 'Text and language are required' }, { status: 400 });
+    }
+
+    let base64Audio: string;
+
+    if (lang === 'or') {
+        base64Audio = await getAnuvadiniTtsAudio(text);
+    } else {
+        return NextResponse.json({ error: 'This endpoint is for Odia (or) language only.'}, { status: 400 });
+    }
+    
+    const audioBuffer = Buffer.from(base64Audio, 'base64');
+
+    return new NextResponse(audioBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'audio/mpeg',
+        'Content-Length': String(audioBuffer.length),
+      },
+    });
+  } catch (error: any) {
+    console.error('TTS API Route Error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to generate audio' }, { status: 500 });
   }
 }
