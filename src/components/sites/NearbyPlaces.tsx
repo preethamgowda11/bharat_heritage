@@ -75,10 +75,15 @@ const LoadingSkeleton = () => (
 
 type PoiCategory = 'stays' | 'tourist' | 'offbeat';
 
-const categoryTags: Record<PoiCategory, string[]> = {
-  stays: ['tourism=hotel', 'tourism=guest_house', 'tourism=hostel', 'tourism=apartment'],
-  tourist: ['tourism=attraction', 'tourism=museum', 'historic=yes'],
-  offbeat: ['tourism=viewpoint', 'historic=ruins', 'natural=peak', 'historic=archaeological_site'],
+const categoryTags: Record<PoiCategory, string[][]> = {
+  stays: [
+    ['tourism=hotel'],
+    ['tourism=guest_house'],
+    ['tourism=hostel'],
+    ['tourism=apartment']
+  ],
+  tourist: [['tourism=attraction', 'tourism=museum', 'historic=yes']],
+  offbeat: [['tourism=viewpoint', 'historic=ruins', 'natural=peak', 'historic=archaeological_site']],
 };
 
 
@@ -115,8 +120,18 @@ export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: Nearby
     setError(prev => ({...prev, [category]: null}));
 
     try {
-      const pois = await fetchNearbyPOIs(lat, lon, radius, categoryTags[category]);
-      setData(prev => ({...prev, [category]: pois}));
+      const tagGroups = categoryTags[category];
+      let allPois: POI[] = [];
+
+      for (const tags of tagGroups) {
+        const pois = await fetchNearbyPOIs(lat, lon, radius, tags);
+        allPois = [...allPois, ...pois];
+      }
+      
+      // Remove duplicates
+      const uniquePois = Array.from(new Map(allPois.map(p => [p.id, p])).values());
+
+      setData(prev => ({...prev, [category]: uniquePois}));
     } catch (e: any) {
       setError(prev => ({...prev, [category]: e.message || `Failed to fetch ${category}.`}));
     } finally {
