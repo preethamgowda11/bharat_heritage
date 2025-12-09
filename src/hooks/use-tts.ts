@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
@@ -23,6 +24,16 @@ export function useTts() {
   const sentencesQueueRef = useRef<string[]>([]);
   const currentLangRef = useRef<Language>('en');
   const isStoppingRef = useRef(false);
+
+  const stop = useCallback(() => {
+    isStoppingRef.current = true;
+    sentencesQueueRef.current = [];
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = ""; // Clear the audio source
+    }
+    setIsSpeaking(false);
+  }, []);
 
   const playNextSentence = useCallback(async () => {
     if (isStoppingRef.current) {
@@ -97,16 +108,6 @@ export function useTts() {
         playNextSentence();
       }
     }, [isSpeaking, playNextSentence, stop]);
-
-  const stop = useCallback(() => {
-    isStoppingRef.current = true;
-    sentencesQueueRef.current = [];
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = ""; // Clear the audio source
-    }
-    setIsSpeaking(false);
-  }, []);
   
   // Cleanup on unmount
   useEffect(() => {
