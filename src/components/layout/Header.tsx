@@ -13,6 +13,7 @@ import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 export function Header() {
@@ -31,6 +32,7 @@ export function Header() {
         title: 'Signed Out',
         description: 'You have been successfully signed out.',
       });
+      // After signing out, a new anonymous user will be created by the hook in layout
       router.push('/');
     } catch (error) {
       console.error("Logout error:", error);
@@ -54,34 +56,36 @@ export function Header() {
             </span>
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-2">
-            {!isUserLoading && (
-              user ? (
-                <>
-                  <div className="flex items-center gap-2 border-r pr-2 mr-2">
-                    <Gem className="h-5 w-5 text-yellow-500" />
-                    <span className="font-bold text-sm">0</span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Logout"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="h-5 w-5" />
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Admin Login"
-                >
-                  <Link href="/login">
-                    <User className="h-5 w-5" />
-                  </Link>
-                </Button>
-              )
+            {isUserLoading ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 border-r pr-2 mr-2">
+                  <Gem className="h-5 w-5 text-yellow-500" />
+                  <span className="font-bold text-sm">0</span>
+                </div>
+                 {user?.isAnonymous ? (
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Admin Login"
+                    >
+                      <Link href="/login">
+                        <User className="h-5 w-5" />
+                      </Link>
+                    </Button>
+                 ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Logout"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-5 w-5" />
+                    </Button>
+                 )}
+              </div>
             )}
             <Button
               variant="ghost"
