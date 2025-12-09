@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapView } from '@/components/common/MapView'; // Import the new MapView component
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { MapView } from '@/components/common/MapView';
 
 interface ScrapedArtifactCardProps {
   name: string;
