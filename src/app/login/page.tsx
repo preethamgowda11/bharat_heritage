@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, KeyRound } from 'lucide-react';
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -27,9 +27,8 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       toast({
         title: 'Signed In',
-        description: 'You have been successfully signed in.',
+        description: 'You have been successfully signed in as an administrator.',
       });
-      // Directly redirect to the dashboard upon successful sign-in
       router.push('/admin/dashboard');
     } catch (error: any) {
       console.error("Sign-in error:", error);
@@ -48,9 +47,12 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <form onSubmit={handleSignIn}>
           <CardHeader>
-            <CardTitle className="text-2xl">Admin Login</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <KeyRound className="h-6 w-6" />
+              Admin Login
+            </CardTitle>
             <CardDescription>
-              Please enter your credentials to access the admin dashboard.
+              This login is for administrators only. Please enter your credentials to access the admin dashboard.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
@@ -59,7 +61,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="admin@example.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -91,3 +93,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    

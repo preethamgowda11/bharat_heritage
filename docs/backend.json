@@ -189,7 +189,8 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "anonymous",
+      "google.com"
     ]
   },
   "firestore": {
@@ -282,3 +283,5 @@
     "reasoning": "The Firestore structure is designed to optimize for security, scalability, and ease of querying, following the principles of Authorization Independence, Structural Segregation, and Access Modeling. User data and preferences are stored under `/users/{userId}`. Heritage sites and their artifacts are stored separately to maintain a flat security structure and avoid complex authorization rules. Admin roles are managed via a separate `/roles_admin/{uid}` collection for simple role verification.\n\n**Authorization Independence:**\n*   The structure avoids hierarchical authorization dependencies. For example, artifact access does NOT depend on fetching heritage site data. Security rules can be written without using `get()` calls.\n*   Specifically, artifacts include `siteId` to enable direct queries and avoid needing to traverse the parent site to access artifact data.\n\n**Structural Segregation:**\n*   Heritage sites and artifacts are stored in separate collections, allowing different security rules if needed in the future. Currently, all sites are assumed to be publicly accessible, while access to user-specific data is restricted to the authenticated user.\n\n**Access Modeling:**\n*   User preferences are stored under `/users/{userId}/preferences` to ensure that only the authenticated user can access and modify their own preferences.\n*   Admin roles are managed using the 'Existence over Content' principle, where the mere existence of a document in `/roles_admin/{uid}` grants admin privileges.\n\n**QAPs (Rules are not Filters):**\n*   The separation of collections ensures that listing heritage sites or artifacts does not require filtering based on user roles or permissions. All heritage sites are considered publicly listable. User-specific data is secured via path-based ownership.\n\n**Invariants:**\n*   Timestamps could be added to each document (e.g., `createdAt`, `updatedAt`) and enforced via security rules to maintain data integrity. Ownership is enforced via the path structure for user-specific data (`/users/{userId}`)."
   }
 }
+
+    

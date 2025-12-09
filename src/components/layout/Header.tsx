@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Accessibility, Settings, LogOut, User, Gem } from 'lucide-react';
+import { Accessibility, Settings, LogOut, User, Gem, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from './Logo';
 import { AccessibilityPanel } from './AccessibilityPanel';
@@ -10,10 +10,11 @@ import { SettingsPanel } from './SettingsPanel';
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { useUser, useAuth } from '@/firebase';
-import { signOut } from 'firebase/auth';
+import { signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
 export function Header() {
@@ -32,7 +33,6 @@ export function Header() {
         title: 'Signed Out',
         description: 'You have been successfully signed out.',
       });
-      // After signing out, a new anonymous user will be created by the hook in layout
       router.push('/');
     } catch (error) {
       console.error("Logout error:", error);
@@ -41,6 +41,26 @@ export function Header() {
         title: 'Logout Failed',
         description: 'Could not sign you out. Please try again.',
       });
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    if (!auth) return;
+    const provider = new GoogleAuthProvider();
+    try {
+        await signInWithPopup(auth, provider);
+        toast({
+            title: 'Signed In',
+            description: 'Welcome! You have successfully signed in.',
+        });
+        router.push('/'); 
+    } catch (error: any) {
+        console.error("Google sign-in error:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Sign-in Failed',
+            description: 'Could not sign you in with Google. Please try again.',
+        });
     }
   };
 
@@ -56,37 +76,44 @@ export function Header() {
             </span>
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-2">
+            <div className="flex items-center gap-2 border-r pr-2 mr-2">
+              <Gem className="h-5 w-5 text-yellow-500" />
+              <span className="font-bold text-sm">0</span>
+            </div>
+
             {isUserLoading ? (
               <Skeleton className="h-8 w-24" />
-            ) : (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 border-r pr-2 mr-2">
-                  <Gem className="h-5 w-5 text-yellow-500" />
-                  <span className="font-bold text-sm">0</span>
+            ) : user?.isAnonymous ? (
+              <>
+                <Button onClick={handleGoogleSignIn} variant="outline" size="sm">
+                  Sign in with Google
+                </Button>
+                <Button asChild variant="ghost" size="icon" aria-label="Admin Login">
+                  <Link href="/login">
+                    <KeyRound className="h-5 w-5" />
+                  </Link>
+                </Button>
+              </>
+            ) : user ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
+                    <AvatarFallback>{user.displayName?.charAt(0) || 'U'}</AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:inline text-sm font-medium">{user.displayName || user.email}</span>
                 </div>
-                 {user?.isAnonymous ? (
-                    <Button
-                      asChild
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Admin Login"
-                    >
-                      <Link href="/login">
-                        <User className="h-5 w-5" />
-                      </Link>
-                    </Button>
-                 ) : (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Logout"
-                      onClick={handleLogout}
-                    >
-                      <LogOut className="h-5 w-5" />
-                    </Button>
-                 )}
-              </div>
-            )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Logout"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              </>
+            ) : null}
+
             <Button
               variant="ghost"
               size="icon"
@@ -111,3 +138,5 @@ export function Header() {
     </>
   );
 }
+
+    
