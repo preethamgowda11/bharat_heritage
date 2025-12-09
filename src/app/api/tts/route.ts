@@ -11,8 +11,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Text and language are required' }, { status: 400 });
     }
 
-    // Path to the Node.js script
-    const scriptPath = path.join(process.cwd(), 'src', 'lib', 'fetch-tts.js');
+    // Correctly resolve the path to the script within the project structure.
+    const scriptPath = path.resolve('./src/lib/fetch-tts.js');
 
     const ttsProcess = spawn('node', [scriptPath, text, lang]);
 
