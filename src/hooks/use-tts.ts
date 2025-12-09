@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Language } from '@/types';
+import { getAudioBase64 } from 'google-tts-api';
 
 const MAX_CHUNK_LENGTH = 200; // Max characters per TTS chunk
 
@@ -14,19 +15,14 @@ const splitSentences = (text: string): string[] => {
 };
 
 async function getAudioFromApi(text: string, lang: Language): Promise<string> {
-    const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, lang }),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch audio');
+    // Directly use the (patched) library function
+    try {
+        const base64Audio = await getAudioBase64(text, { lang, slow: false });
+        return base64Audio;
+    } catch (error: any) {
+        console.error("google-tts-api error:", error);
+        throw new Error(error.message || 'Failed to fetch audio from Google TTS API');
     }
-
-    const { audioBase64 } = await response.json();
-    return audioBase64;
 }
 
 export function useTts() {
@@ -47,13 +43,17 @@ export function useTts() {
   }, []);
 
   const playNextSentence = useCallback(async () => {
+    if (isStoppingRef.current) {
+        setIsSpeaking(false);
+        return;
+    }
     if (sentencesQueueRef.current.length === 0) {
       setIsSpeaking(false);
       return;
     }
 
     const sentence = sentencesQueueRef.current.shift();
-    if (!sentence || isStoppingRef.current) {
+    if (!sentence) {
       setIsSpeaking(false);
       return;
     }
