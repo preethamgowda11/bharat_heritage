@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -30,7 +31,7 @@ export const ScrapedArtifactCard: React.FC<ScrapedArtifactCardProps> = ({ name, 
           </div>
         )}
         <p className="text-muted-foreground">{description}</p>
-        {coordinates && (
+        {coordinates && coordinates.lat && coordinates.lon && (
             <MapView lat={coordinates.lat} lon={coordinates.lon} title={name} />
         )}
       </CardContent>
