@@ -3,7 +3,6 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Language } from '@/types';
-import querystring from 'querystring';
 
 const MAX_CHUNK_LENGTH = 200; // Max characters per TTS chunk
 
@@ -14,46 +13,16 @@ const splitSentences = (text: string): string[] => {
   return text.match(/[^.!?]+[.!?]*/g) || [text];
 };
 
-// Fetches audio from Google's unofficial TTS endpoint
-async function getGoogleTtsAudio(text: string, lang: Language): Promise<string> {
-    const query = {
-        ie: 'UTF-8',
-        q: text,
-        tl: lang,
-        total: 1,
-        idx: 0,
-        textlen: text.length,
-        client: 'tw-ob',
-    };
-    
-    const url = `https://translate.google.com/translate_tts?${querystring.stringify(query)}`;
-
-    const response = await fetch(url, {
-        headers: {
-            'Referer': 'http://translate.google.com/',
-            'User-Agent': 'stagefright/1.2 (Linux;Android 5.0)',
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error(`Google TTS request failed with status ${response.status}`);
-    }
-    
-    const buffer = Buffer.from(await response.arrayBuffer());
-    return buffer.toString('base64');
-}
-
-// Fetches audio from our internal Anuvadini proxy
-async function getAnuvadiniProxyAudio(text: string): Promise<string> {
+async function getAudio(text: string, lang: Language): Promise<string> {
     const response = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, lang: 'or' }),
+        body: JSON.stringify({ text, lang }),
     });
 
     if (!response.ok) {
         const errorBody = await response.json();
-        throw new Error(errorBody.error || `Anuvadini proxy request failed with status ${response.status}`);
+        throw new Error(errorBody.error || `TTS proxy request failed with status ${response.status}`);
     }
 
     const buffer = Buffer.from(await response.arrayBuffer());
@@ -86,9 +55,7 @@ export function useTts() {
 
     try {
       const lang = currentLangRef.current;
-      const base64Audio = lang === 'or' 
-        ? await getAnuvadiniProxyAudio(sentence)
-        : await getGoogleTtsAudio(sentence, lang);
+      const base64Audio = await getAudio(sentence, lang);
 
       if (isStoppingRef.current) return;
 
