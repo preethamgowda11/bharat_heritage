@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { EmergencyHelp } from '@/components/common/EmergencyHelp';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,6 +63,8 @@ export function Header() {
             </span>
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-2">
+            <EmergencyHelp />
+
             <div className="flex items-center gap-2 border-r pr-2 mr-2">
               <Gem className="h-5 w-5 text-yellow-500" />
               <span className="font-bold text-sm">0</span>
