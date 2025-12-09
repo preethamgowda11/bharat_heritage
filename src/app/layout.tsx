@@ -10,7 +10,6 @@ import './globals.css';
 import { LowBandwidthIndicator } from '@/components/common/LowBandwidthIndicator';
 import { FirebaseClientProvider } from '@/firebase';
 import { Chatbot } from '@/components/chatbot/Chatbot';
-import { useAnonymousSignIn } from '@/firebase/auth/use-anonymous-sign-in';
 
 // Note: Metadata is still here but will be handled by the 'use client' parent.
 // For SEO, it's better to move static metadata to a server-side parent layout if possible.
@@ -23,8 +22,7 @@ export const metadata: Metadata = {
 */
 
 function AppLayout({ children }: { children: React.ReactNode }) {
-  useAnonymousSignIn(); // Hook to ensure user is signed in anonymously
-
+  // Removed useAnonymousSignIn hook to prevent automatic sign-in attempts
   return (
     <>
       <div className="relative flex min-h-screen flex-col">

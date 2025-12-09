@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Accessibility, Settings, LogOut, User, Gem, KeyRound, Triangle } from 'lucide-react';
+import { Accessibility, Settings, LogOut, User, Gem, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from './Logo';
 import { AccessibilityPanel } from './AccessibilityPanel';
@@ -10,7 +10,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { useUser, useAuth } from '@/firebase';
-import { signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -51,27 +51,6 @@ export function Header() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    if (!auth) return;
-    const provider = new GoogleAuthProvider();
-    try {
-        await signInWithPopup(auth, provider);
-        toast({
-            title: 'Signed In',
-            description: 'Welcome! You have successfully signed in.',
-        });
-        router.push('/'); 
-    } catch (error: any) {
-        console.error("Google sign-in error:", error);
-        toast({
-            variant: 'destructive',
-            title: 'Sign-in Failed',
-            description: 'Could not sign you in with Google. Please try again.',
-        });
-    }
-  };
-
-
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -89,31 +68,7 @@ export function Header() {
             </div>
 
             {isUserLoading ? (
-              <Skeleton className="h-8 w-8 rounded-full" />
-            ) : user?.isAnonymous ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="User actions"
-                  >
-                    <User className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Sign In</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleGoogleSignIn}>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>User Sign-In (Google)</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/login')}>
-                     <KeyRound className="mr-2 h-4 w-4" />
-                     <span>Admin Login</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Skeleton className="h-8 w-20 rounded-md" />
             ) : user ? (
                <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -126,8 +81,8 @@ export function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                    <DropdownMenuLabel>
-                     <p className="text-sm font-medium leading-none">{user.displayName || user.email}</p>
-                     <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                     <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
+                     {user.email && <p className="text-xs leading-none text-muted-foreground">{user.email}</p>}
                    </DropdownMenuLabel>
                    <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
@@ -136,7 +91,11 @@ export function Header() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : null}
+            ) : (
+              <Button asChild>
+                <Link href="/login">Login</Link>
+              </Button>
+            )}
 
             <Button
               variant="ghost"
