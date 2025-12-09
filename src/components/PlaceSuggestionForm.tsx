@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { getDb, initFirebaseClient } from '@/lib/firebaseClient';
+import { useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-
-initFirebaseClient();
 
 export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }: { siteId?: string; lat?: number; lon?: number; onAfterSubmit?: () => void }) {
   const [open, setOpen] = useState(false);
@@ -22,6 +20,7 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const firestore = useFirestore();
 
   const reset = () => { setName(''); setCategory('offbeat'); setAddress(''); setPhone(''); setWebsite(''); setDescription(''); };
 
@@ -41,8 +40,7 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
     }
     setLoading(true);
     try {
-      const db = getDb();
-      const col = collection(db, 'suggested_places');
+      const col = collection(firestore, 'suggested_places');
       await addDoc(col, {
         siteId: siteId || null,
         name: name.trim(),
@@ -68,7 +66,7 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} variant="secondary">Suggest a Place</Button>
+      <Button onClick={() => setOpen(true)} variant="secondary" className="w-full">Suggest a Place</Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[600px]">

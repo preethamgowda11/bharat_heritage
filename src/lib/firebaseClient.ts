@@ -1,4 +1,4 @@
-import { initializeApp, getApps } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 let db: ReturnType<typeof getFirestore> | null = null;
@@ -12,7 +12,9 @@ export function initFirebaseClient() {
       messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
       appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
     };
-    try { initializeApp(conf); } catch (e) { console.warn('Firebase init error', e); }
+    try { 
+        const app = getApps().length > 0 ? getApp() : initializeApp(conf);
+    } catch (e) { console.warn('Firebase init error', e); }
   }
   if (!db) db = getFirestore();
   return db;

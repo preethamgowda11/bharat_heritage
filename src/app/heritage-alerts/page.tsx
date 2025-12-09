@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Camera, Plus } from 'lucide-react';
 import Link from 'next/link';
+import PlaceSuggestionForm from '@/components/PlaceSuggestionForm';
+
 
 export default function HeritageAlertsPage() {
   return (
@@ -34,9 +36,7 @@ export default function HeritageAlertsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" disabled>
-                Submit a Report (Coming Soon)
-              </Button>
+              <PlaceSuggestionForm />
             </CardContent>
           </Card>
           
