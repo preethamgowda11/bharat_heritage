@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -72,13 +73,13 @@ export default function Home() {
                 {t('lost_india_title')}
               </Link>
             </Button>
-            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+            <Button asChild size="lg" variant="secondary">
                <a href='/ar-sculptures/sample-addon/viewer.html' target='_blank' rel='noopener noreferrer' className='flex items-center'>
                 <ScanLine className="mr-2 h-5 w-5" />
                 Scan & Learn
               </a>
             </Button>
-            <Button asChild size="lg" variant="destructive">
+            <Button asChild size="lg" variant="secondary">
               <Link href="/danger-check">
                 <ShieldAlert className="mr-2 h-5 w-5" />
                 Heritage Alert
