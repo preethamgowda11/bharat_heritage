@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState }from 'react';
@@ -9,6 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft } from 'lucide-react';
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -76,8 +78,11 @@ export default function LoginPage() {
               />
             </div>
           </CardContent>
-          <CardFooter>
-            <Button className="w-full" type="submit" disabled={isLoading}>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" type="button" onClick={() => router.back()} disabled={isLoading}>
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back
+            </Button>
+            <Button className="w-auto" type="submit" disabled={isLoading}>
               {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </CardFooter>
