@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useUserPreferences } from '@/context/UserPreferencesContext';
@@ -12,6 +13,7 @@ import {
   DialogFooter
 } from '@/components/ui/dialog';
 import { t as translate } from '@/lib/i18n';
+import { useState } from 'react';
 
 interface LanguageSelectorProps {
   onSelect: () => void;
@@ -28,15 +30,22 @@ const languageOptions: { code: Language; label: Record<Language, string> }[] = [
 
 export function LanguageSelector({ onSelect, onSkip }: LanguageSelectorProps) {
   const { language, setLanguage, setIsAudioOn } = useUserPreferences();
+  const [isOpen, setIsOpen] = useState(true);
 
   const handleSelect = (langCode: Language) => {
     setLanguage(langCode);
     setIsAudioOn(true); // As per JSON spec `enableTTSForLocale`
+    setIsOpen(false);
     onSelect();
   };
 
+  const handleSkip = () => {
+    setIsOpen(false);
+    onSkip();
+  }
+
   return (
-    <Dialog open={true}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[425px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader className="text-center">
           <DialogTitle className="font-headline text-2xl">
@@ -64,7 +73,7 @@ export function LanguageSelector({ onSelect, onSkip }: LanguageSelectorProps) {
           ))}
         </div>
         <DialogFooter className="sm:justify-center">
-            <Button variant="link" onClick={onSkip}>
+            <Button variant="link" onClick={handleSkip}>
               {translate('skip_use_english', language)}
             </Button>
         </DialogFooter>
