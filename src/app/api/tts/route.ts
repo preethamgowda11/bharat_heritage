@@ -8,25 +8,27 @@ const ANUVADINI_API_KEY = "0000000000-0000-0000-0000-000000000000";
 
 async function handleAnuvadiniRequest(text: string, lang: string) {
   const payload = {
-    "pipelineTasks": [
+    "pipelineRequest": { // This wrapper was missing
+      "pipelineTasks": [
         {
-            "taskType": "tts",
-            "config": {
-                "language": {
-                    "sourceLanguage": lang
-                },
-                "serviceId": "ai4bharat/indic-tts-v2-indo_aryan-gpu--t4",
-                "gender": "female",
-                "samplingRate": 22050
-            }
+          "taskType": "tts",
+          "config": {
+            "language": {
+              "sourceLanguage": lang
+            },
+            "serviceId": "ai4bharat/indic-tts-v2-indo_aryan-gpu--t4",
+            "gender": "female",
+            "samplingRate": 22050
+          }
         }
-    ],
-    "inputData": {
+      ],
+      "inputData": {
         "input": [
-            {
-                "source": text
-            }
+          {
+            "source": text
+          }
         ]
+      }
     }
   };
 
