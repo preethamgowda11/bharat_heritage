@@ -51,7 +51,7 @@ export default function Home() {
             </Link>
           </Button>
           <Button asChild size="lg" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-            <Link href="/heritage-alerts">
+            <Link href="/danger-check">
               <ShieldAlert className="mr-2 h-5 w-5" />
               Heritage Alert
             </Link>
