@@ -75,6 +75,13 @@ const LoadingSkeleton = () => (
 
 type PoiCategory = 'stays' | 'tourist' | 'offbeat';
 
+const categoryTags: Record<PoiCategory, string[]> = {
+  stays: ['tourism=hotel', 'tourism=guest_house', 'tourism=hostel', 'tourism=apartment'],
+  tourist: ['tourism=attraction', 'tourism=museum', 'historic=yes'],
+  offbeat: ['tourism=viewpoint', 'historic=ruins', 'natural=peak', 'historic=archaeological_site'],
+};
+
+
 export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: NearbyPlacesProps) {
   const [data, setData] = useState<Record<PoiCategory, POI[]>>({
     stays: [],
@@ -98,12 +105,6 @@ export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: Nearby
     offbeat: false,
   });
 
-  const categoryTags: Record<PoiCategory, string[]> = {
-    stays: ['tourism=hotel', 'tourism=guest_house', 'tourism=hostel', 'tourism=apartment'],
-    tourist: ['tourism=attraction', 'tourism=museum', 'historic=yes'],
-    offbeat: ['tourism=viewpoint', 'historic=ruins', 'natural=peak', 'historic=archaeological_site'],
-  };
-
   const fetchCategoryData = useCallback(async (category: PoiCategory) => {
     if (!lat || !lon) {
       setLoading(prev => ({...prev, [category]: false}));
@@ -121,7 +122,7 @@ export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: Nearby
     } finally {
       setLoading(prev => ({...prev, [category]: false}));
     }
-  }, [lat, lon, radius, categoryTags]);
+  }, [lat, lon, radius]);
 
   // Fetch initial data for the default tab ('stays')
   useEffect(() => {
@@ -198,4 +199,3 @@ export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: Nearby
     </section>
   );
 }
-
