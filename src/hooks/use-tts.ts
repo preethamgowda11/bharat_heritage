@@ -1,122 +1,124 @@
 
 'use client';
-
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import type { Language } from '@/types';
-import { useToast } from './use-toast';
 
-const splitIntoChunks = (text: string): string[] => {
-  if (!text) return [];
-  const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
-  return sentences.map(s => s.trim()).filter(s => s.length > 0);
+interface TTSResult {
+  url: string;
+  shortText: string;
+}
+
+const UI_TEXT = {
+  loading: 'Loading audio...',
+  speaking: 'Playing audio...',
+  error: 'Unable to play audio.',
+  noText: 'No description available.',
 };
 
 export function useTts() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const sentencesQueueRef = useRef<string[]>([]);
-  const currentLangRef = useRef<Language>('en');
-  const isStoppingRef = useRef(false);
+  const playlistRef = useRef<string[]>([]);
+  const currentTrackIndexRef = useRef(0);
+
+  // Initialize audio element
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      audioRef.current = new Audio();
+
+      const handleEnded = () => {
+        // Play next track if available
+        if (currentTrackIndexRef.current < playlistRef.current.length - 1) {
+          currentTrackIndexRef.current++;
+          if (audioRef.current) {
+            audioRef.current.src = playlistRef.current[currentTrackIndexRef.current];
+            audioRef.current.play().catch(e => console.error("Playback error", e));
+          }
+        } else {
+          setIsSpeaking(false);
+        }
+      };
+
+      const handleError = (e: Event) => {
+        console.error("Audio error", e);
+        setIsSpeaking(false);
+        toast({ variant: 'destructive', title: UI_TEXT.error });
+      };
+
+      audioRef.current.addEventListener('ended', handleEnded);
+      audioRef.current.addEventListener('error', handleError);
+      
+      return () => {
+        if (audioRef.current) {
+          audioRef.current.removeEventListener('ended', handleEnded);
+          audioRef.current.removeEventListener('error', handleError);
+          audioRef.current.pause();
+          audioRef.current = null;
+        }
+      };
+    }
+  }, [toast]);
 
   const stop = useCallback(() => {
-    isStoppingRef.current = true;
-    sentencesQueueRef.current = [];
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.src = "";
+      audioRef.current.currentTime = 0;
     }
     setIsSpeaking(false);
+    playlistRef.current = [];
+    currentTrackIndexRef.current = 0;
   }, []);
 
-  const playNextSentence = useCallback(async () => {
-    if (isStoppingRef.current) {
-      setIsSpeaking(false);
-      isStoppingRef.current = false;
-      return;
-    }
-    if (sentencesQueueRef.current.length === 0) {
-      setIsSpeaking(false);
+  const speak = useCallback(async (text: string, lang: Language) => {
+    if (!text) {
+      toast({ variant: 'destructive', title: UI_TEXT.noText });
       return;
     }
 
+    stop(); // Stop any current playback
     setIsSpeaking(true);
-    const sentence = sentencesQueueRef.current.shift();
-    if (!sentence) {
-      setIsSpeaking(false);
-      return;
-    }
+    toast({ title: UI_TEXT.loading });
 
     try {
       const response = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: sentence, lang: currentLangRef.current }),
+        body: JSON.stringify({ text, lang }),
       });
-      
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch audio');
+        throw new Error('Failed to fetch audio');
       }
 
-      const { media: audioDataUrl } = await response.json();
+      const data = await response.json();
+      const results: TTSResult[] = data.results;
 
-      if (isStoppingRef.current) {
-        setIsSpeaking(false);
-        isStoppingRef.current = false;
-        return;
+      if (results && results.length > 0) {
+        playlistRef.current = results.map(r => r.url);
+        currentTrackIndexRef.current = 0;
+        if (audioRef.current) {
+          audioRef.current.src = playlistRef.current[0];
+          audioRef.current.play()
+            .then(() => {
+              toast({ title: UI_TEXT.speaking });
+            })
+            .catch(e => {
+              console.error("Playback start error", e);
+              setIsSpeaking(false);
+              toast({ variant: 'destructive', title: UI_TEXT.error });
+            });
+        }
+      } else {
+        throw new Error('No audio URLs returned');
       }
-
-      if (!audioRef.current) {
-        audioRef.current = new Audio();
-        audioRef.current.onended = playNextSentence;
-        audioRef.current.onerror = (e) => {
-          console.error('Audio playback error', e);
-          toast({
-            variant: 'destructive',
-            title: 'Playback Error',
-            description: 'Could not play the generated audio.',
-          });
-          playNextSentence();
-        };
-      }
-
-      audioRef.current.src = audioDataUrl;
-      await audioRef.current.play();
-
-    } catch (error: any) {
-      console.error('TTS generation failed for sentence:', sentence, error);
-      toast({
-        variant: 'destructive',
-        title: 'TTS Error',
-        description: error.message || 'Could not generate audio for the selected text.',
-      });
-      playNextSentence();
+    } catch (error) {
+      console.error('TTS Error:', error);
+      setIsSpeaking(false);
+      toast({ variant: 'destructive', title: UI_TEXT.error });
     }
-  }, [toast]);
-  
-  const speak = useCallback((text: string, lang: Language) => {
-    if (isSpeaking) {
-      stop();
-      return;
-    }
-
-    isStoppingRef.current = false;
-    currentLangRef.current = lang;
-    
-    const chunks = splitIntoChunks(text);
-    sentencesQueueRef.current = chunks;
-
-    if (sentencesQueueRef.current.length > 0) {
-      playNextSentence();
-    }
-  }, [isSpeaking, playNextSentence, stop]);
-  
-  useEffect(() => {
-    return () => {
-      stop();
-    };
-  }, [stop]);
+  }, [stop, toast]);
 
   return { speak, stop, isSpeaking };
 }
