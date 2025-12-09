@@ -1,7 +1,5 @@
-Flask>=2.0
-gunicorn>=20.0
-ultralytics
-Pillow
-torch
-torchvision
-# Add other dependencies your model needs, e.g., numpy, opencv-python-headless
+# Please add your Python dependencies here.
+# For example:
+# Flask>=2.0
+# ultralytics
+# torch
