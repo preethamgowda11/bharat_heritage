@@ -55,6 +55,49 @@ export default function DangerCheckPage() {
       }
     };
   }, [toast]);
+
+  const handleCheckDanger = async () => {
+    if (!videoRef.current) return;
+    setIsChecking(true);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not get canvas context' });
+      setIsChecking(false);
+      return;
+    }
+
+    context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    const imageBase64 = canvas.toDataURL('image/jpeg').split(',')[1];
+    
+    try {
+      const apiResult = await runDangerCheck(imageBase64);
+
+      if (apiResult.ok && apiResult.result) {
+        const firstPrediction = apiResult.result.predictions?.[0];
+        setResult({
+          score: firstPrediction?.confidence || 0,
+          label: firstPrediction?.class || 'No danger detected',
+        });
+      } else {
+         setResult({ score: 0, label: 'Analysis inconclusive' });
+      }
+      setShowResultDialog(true);
+    } catch (e: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Analysis Failed',
+        description: e.message || 'The danger check could not be completed.',
+      });
+       setResult({ score: null, label: 'Error' });
+       setShowResultDialog(true);
+    } finally {
+      setIsChecking(false);
+    }
+  };
   
   const getRiskLevel = (score: number | null) => {
     if (score === null) return { text: 'Unknown', color: 'text-gray-500' };
@@ -91,6 +134,15 @@ export default function DangerCheckPage() {
               <Button variant="secondary" onClick={() => router.back()}>
                 Back
               </Button>
+            </div>
+
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
+              <Button onClick={handleCheckDanger} size="lg" className="h-16 w-16 rounded-full" disabled={isChecking}>
+                {isChecking ? <Loader className="h-8 w-8 animate-spin" /> : <Camera className="h-8 w-8" />}
+              </Button>
+              <p className="text-white text-center mt-2 text-sm font-semibold bg-black/50 rounded-md px-2 py-1">
+                {isChecking ? 'Analyzing...' : 'Scan for Danger'}
+              </p>
             </div>
          </>
       )}
