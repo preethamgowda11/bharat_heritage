@@ -15,7 +15,7 @@ async function handleAnuvadiniRequest(text: string, lang: string) {
                 "language": {
                     "sourceLanguage": lang
                 },
-                "serviceId": "ai4bharat/indic-tts-coqui-indo_aryan-gpu--t4",
+                "serviceId": "ai4bharat/indic-tts-v2-indo_aryan-gpu--t4",
                 "gender": "female",
                 "samplingRate": 22050
             }
