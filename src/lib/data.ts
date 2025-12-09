@@ -176,6 +176,12 @@ const allSites: Site[] = siteCoordinatesData.siteCoordinates.map(coord => {
     fallback360UrlId: 'fallback-360-taj',
     artifacts: allArtifacts.filter((a) => a.siteId === 'site-1'),
     arLink: 'https://nizammhd.github.io/tajmahal/',
+    events: [
+      {
+        date: '2024-10-17',
+        name: { en: 'Sharad Purnima', hi: 'शरद पूर्णिमा', kn: 'ಶರದ್ ಪೂರ್ಣಿಮಾ', or: 'ଶରଦ ପୂର୍ଣ୍ଣିମା' },
+      },
+    ],
   },
   {
     id: 'site-2',
@@ -204,6 +210,16 @@ const allSites: Site[] = siteCoordinatesData.siteCoordinates.map(coord => {
     fallback360UrlId: 'fallback-360-hampi',
     artifacts: allArtifacts.filter((a) => a.siteId === 'site-2'),
     arLink: 'https://nizammhd.github.io/hampiiii/',
+    events: [
+      {
+        date: '2024-11-01',
+        name: { en: 'Hampi Utsav', hi: 'हम्पी उत्सव', kn: 'ಹಂಪಿ ಉತ್ಸವ', or: 'ହାମ୍ପି ଉତ୍ସବ' },
+      },
+       {
+        date: '2025-01-14',
+        name: { en: 'Makar Sankranti', hi: 'मकर संक्रांति', kn: 'ಮಕರ ಸಂಕ್ರಾಂತಿ', or: 'ମକର ସଂକ୍ରାନ୍ତି' },
+      },
+    ],
   },
   {
     id: 'site-3',
@@ -259,6 +275,16 @@ const allSites: Site[] = siteCoordinatesData.siteCoordinates.map(coord => {
     fallback360UrlId: 'fallback-360-konark',
     artifacts: allArtifacts.filter((a) => a.siteId === 'site-4'),
     arLink: 'https://nizammhd.github.io/MobileAR/',
+    events: [
+      {
+        date: '2024-12-01',
+        name: { en: 'Konark Dance Festival', hi: 'कोणार्क नृत्य महोत्सव', kn: 'ಕೋನಾರ್ಕ್ ನೃತ್ಯ ಉತ್ಸವ', or: 'କୋଣାର୍କ ନୃତ୍ୟ ମହୋତ୍ସବ' },
+      },
+       {
+        date: '2025-02-15',
+        name: { en: 'Magha Saptami', hi: 'माघ सप्तमी', kn: 'ಮಾಘ ಸಪ್ತಮಿ', or: 'ମାଘ ସପ୍ତମୀ' },
+      },
+    ],
   },
   {
     id: 'site-6',
@@ -342,6 +368,12 @@ const allSites: Site[] = siteCoordinatesData.siteCoordinates.map(coord => {
     fallback360UrlId: 'fallback-360-jagannath-puri',
     artifacts: allArtifacts.filter((a) => a.siteId === 'site-8'),
     arLink: 'https://nizammhd.github.io/MobileAR-jagannad-/',
+    events: [
+      {
+        date: '2025-07-07',
+        name: { en: 'Ratha Yatra', hi: 'रथ यात्रा', kn: 'ರಥ ಯಾತ್ರೆ', or: 'ରଥ ଯାତ୍ରା' },
+      },
+    ],
   },
   {
     id: 'site-9',

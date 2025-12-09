@@ -16,6 +16,7 @@ import { BionicReading } from '@/components/common/BionicReading';
 import { Separator } from '../ui/separator';
 import NearbyPlaces from './NearbyPlaces';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { EventCalendar } from './EventCalendar';
 
 interface SiteDetailViewProps {
   site: Site;
@@ -129,6 +130,13 @@ export function SiteDetailView({ site }: SiteDetailViewProps) {
       <article className="prose prose-lg max-w-none mx-auto text-foreground/90 mb-6">
         <BionicReading text={longDescription} as="p" className="detail-description" />
       </article>
+
+      {site.events && site.events.length > 0 && (
+        <>
+          <Separator className="my-12" />
+          <EventCalendar events={site.events} />
+        </>
+      )}
 
       {site.lat && site.lon && (
         <>

@@ -2,6 +2,11 @@
 
 export type Language = 'en' | 'hi' | 'kn' | 'or';
 
+export interface SiteEvent {
+  date: string; // YYYY-MM-DD
+  name: Record<Language, string>;
+}
+
 export interface Site {
   id: string;
   title: Record<Language, string>;
@@ -17,6 +22,7 @@ export interface Site {
   lat?: number;
   lon?: number;
   state: string;
+  events?: SiteEvent[];
 }
 
 export interface Artifact {
