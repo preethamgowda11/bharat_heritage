@@ -81,6 +81,11 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <div className='mt-6 flex justify-center'>
+        <a href='/ar-sculptures/sample-addon/viewer.html' target='_blank' rel='noopener noreferrer' className='inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition'>
+          Scan &amp; Learn
+        </a>
+      </div>
     </>
   );
 }
