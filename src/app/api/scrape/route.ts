@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -15,13 +16,14 @@ export async function GET(request: Request) {
     const searchResponse = await fetch(searchUrl, { headers: { 'User-Agent': 'Heritage-Explorer/1.0 (contact@example.com)' } });
 
     if (!searchResponse.ok) {
+      const errorText = await searchResponse.text();
+      console.error(`Wikipedia search API error: ${searchResponse.status}`, errorText);
       return NextResponse.json({ error: `Failed to search on Wikipedia (${lang})` }, { status: searchResponse.status });
     }
 
     const searchData = await searchResponse.json();
     if (!searchData.query || !searchData.query.search || searchData.query.search.length === 0) {
-      // Using a more specific error message for the frontend to handle.
-      return NextResponse.json({ error: `No results found for "${searchTerm}"` }, { status: 404 });
+      return NextResponse.json({ error: `No results found for "${searchTerm}" on Wikipedia (${lang}).` }, { status: 404 });
     }
 
     const pageTitle = searchData.query.search[0].title;
@@ -75,6 +77,7 @@ export async function GET(request: Request) {
 
   } catch (error) {
     console.error('API route error:', error);
-    return NextResponse.json({ error: 'Failed to process the request' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ error: 'Failed to process the request', details: errorMessage }, { status: 500 });
   }
 }
