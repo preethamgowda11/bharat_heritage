@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Accessibility, Settings, LogOut, User, Gem, KeyRound } from 'lucide-react';
+import { Accessibility, Settings, LogOut, User, Gem, KeyRound, Triangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from './Logo';
 import { AccessibilityPanel } from './AccessibilityPanel';
@@ -15,7 +15,14 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export function Header() {
   const [isAccessibilityOpen, setAccessibilityOpen] = useState(false);
@@ -82,36 +89,53 @@ export function Header() {
             </div>
 
             {isUserLoading ? (
-              <Skeleton className="h-8 w-24" />
+              <Skeleton className="h-8 w-8 rounded-full" />
             ) : user?.isAnonymous ? (
-              <>
-                <Button onClick={handleGoogleSignIn} variant="outline" size="sm">
-                  Sign in with Google
-                </Button>
-                <Button asChild variant="ghost" size="icon" aria-label="Admin Login">
-                  <Link href="/login">
-                    <KeyRound className="h-5 w-5" />
-                  </Link>
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="User actions"
+                  >
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Sign In</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleGoogleSignIn}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>User Sign-In (Google)</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/login')}>
+                     <KeyRound className="mr-2 h-4 w-4" />
+                     <span>Admin Login</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : user ? (
-              <>
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
-                    <AvatarFallback>{user.displayName?.charAt(0) || 'U'}</AvatarFallback>
-                  </Avatar>
-                  <span className="hidden sm:inline text-sm font-medium">{user.displayName || user.email}</span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Logout"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </>
+               <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
+                        <AvatarFallback>{user.displayName?.charAt(0) || 'U'}</AvatarFallback>
+                      </Avatar>
+                   </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                   <DropdownMenuLabel>
+                     <p className="text-sm font-medium leading-none">{user.displayName || user.email}</p>
+                     <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                   </DropdownMenuLabel>
+                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : null}
 
             <Button
@@ -138,5 +162,3 @@ export function Header() {
     </>
   );
 }
-
-    
