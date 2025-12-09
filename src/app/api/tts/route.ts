@@ -11,8 +11,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Text and language are required' }, { status: 400 });
     }
 
+    // The library expects 'or-IN' for Odia, not 'or'.
+    const effectiveLang = lang === 'or' ? 'or-IN' : lang;
+
     const base64Audio = await getAudioBase64(text, {
-      lang: lang,
+      lang: effectiveLang,
       slow: false,
     });
 
