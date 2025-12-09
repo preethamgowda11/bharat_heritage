@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { UserPreferencesProvider } from '@/context/UserPreferencesContext';
 import { Header } from '@/components/layout/Header';
@@ -6,6 +7,7 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 import { LowBandwidthIndicator } from '@/components/common/LowBandwidthIndicator';
 import { FirebaseClientProvider } from '@/firebase';
+import { Chatbot } from '@/components/chatbot/Chatbot';
 
 export const metadata: Metadata = {
   title: 'Bharat Heritage',
@@ -40,6 +42,7 @@ export default function RootLayout({
           src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"
           async
         ></script>
+        <link rel="stylesheet" href="/chatbot/chatbot-styles.css" />
       </head>
       <body
         className={cn(
@@ -52,6 +55,7 @@ export default function RootLayout({
               <Header />
               <LowBandwidthIndicator />
               <main className="flex-1">{children}</main>
+              <Chatbot />
             </div>
             <Toaster />
           </UserPreferencesProvider>

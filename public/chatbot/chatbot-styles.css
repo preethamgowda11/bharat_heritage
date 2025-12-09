@@ -1,0 +1,108 @@
+
+.chatbot-widget {
+  position: fixed;
+  bottom: calc(1rem + 70px); /* Position above the floating button */
+  right: 1rem;
+  width: 370px;
+  max-width: calc(100vw - 2rem);
+  height: 600px;
+  max-height: calc(100vh - 2rem - 70px);
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(20px) scale(0.95);
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  transform-origin: bottom right;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.chatbot-widget.open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: all;
+}
+
+.chatbot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.chatbot-close-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.chatbot-body {
+  flex-grow: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background-color: hsl(var(--background));
+}
+
+.chat-message {
+  margin-bottom: 1rem;
+  display: flex;
+  max-width: 85%;
+}
+
+.chat-message.user {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.chat-message p {
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  line-height: 1.5;
+}
+
+.chat-message.bot p {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border-bottom-left-radius: 0.25rem;
+}
+
+.chat-message.user p {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-bottom-right-radius: 0.25rem;
+}
+
+.chatbot-footer {
+  padding: 0.75rem;
+  border-top: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
+  flex-shrink: 0;
+}
+
+/* Floating Action Button */
+.fixed.bottom-4.right-4 {
+    z-index: 1000;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .chatbot-widget {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    height: calc(100vh - 2rem);
+    max-height: none;
+  }
+}

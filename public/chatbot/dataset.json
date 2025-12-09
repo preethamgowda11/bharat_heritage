@@ -1,0 +1,45 @@
+
+{
+  "qa_pairs": [
+    {
+      "question": "What is this app for?",
+      "answer": "Heritage Lens lets you explore India's rich cultural heritage through Augmented Reality. You can take virtual tours of historical sites and examine ancient artifacts up close."
+    },
+    {
+      "question": "How do I use the AR feature?",
+      "answer": "Navigate to a specific Site or Artifact page and look for the 'Launch AR' button. This will open your camera and place a 3D model of the object in your environment."
+    },
+    {
+      "question": "What is accessibility mode?",
+      "answer": "Accessibility mode provides features like audio narration, adjustable font sizes, high-contrast themes, and a dyslexia-friendly font to make the app easier to use for everyone. You can enable it in the Accessibility panel (the person icon in the header)."
+    },
+    {
+      "question": "Tell me about the sites I can explore.",
+      "answer": "You can explore famous Indian heritage sites like the Taj Mahal, Hampi, Qutub Minar, and the Konark Sun Temple. Just click 'Explore Sites' on the home page to get started."
+    },
+    {
+      "question": "What kind of artifacts can I see?",
+      "answer": "The app features detailed 3D models of artifacts like Mughal paintings, ancient coins, and famous sculptures like the Lakshmi Narasimha statue from Hampi. Go to 'Discover Artifacts' to see the collection."
+    },
+    {
+      "question": "What is low bandwidth mode?",
+      "answer": "Low bandwidth mode helps the app run faster on slow internet connections. It automatically uses lower-quality images and simpler 3D models to save data. You can toggle this in the Settings panel (the gear icon)."
+    },
+    {
+      "question": "How can I change the language?",
+      "answer": "You can change the app's language in the Settings panel (the gear icon in the header). We currently support English, Hindi, Kannada, and Odia."
+    },
+    {
+      "question": "Who built this application?",
+      "answer": "This application was built by an AI agent to showcase the exploration of cultural heritage through technology."
+    },
+    {
+      "question": "Can I get audio descriptions of the sites?",
+      "answer": "Yes! Turn on 'Audio Narration' in the Accessibility panel (the person icon). Then, on any site or artifact detail page, press the 'Read Aloud' button to hear the description."
+    },
+    {
+      "question": "What is Lost India?",
+      "answer": "The 'Lost India' section highlights endangered or forgotten heritage sites, as well as the myths and facts surrounding them. It's a way to discover hidden gems of Indian history."
+    }
+  ]
+}
