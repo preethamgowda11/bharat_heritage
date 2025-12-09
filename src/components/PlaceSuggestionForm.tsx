@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { Gem } from 'lucide-react';
 
 export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }: { siteId?: string; lat?: number; lon?: number; onAfterSubmit?: () => void }) {
   const [open, setOpen] = useState(false);
@@ -54,7 +55,10 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
         status: 'pending',
         createdAt: serverTimestamp()
       });
-      toast({ title: 'Success', description: 'Thanks — suggestion submitted for review.'});
+      toast({ 
+        title: 'Suggestion Submitted!', 
+        description: 'Thanks for contributing! You\'ll receive Supercoins upon approval.'
+      });
       reset();
       onAfterSubmit && onAfterSubmit();
       setTimeout(() => { setOpen(false); }, 1400);
@@ -71,7 +75,13 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Suggest a Place</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Gem className="h-5 w-5 text-primary" />
+              Suggest a Place & Earn Rewards
+            </DialogTitle>
+            <DialogDescription>
+              Help us grow our collection of heritage spots. You'll earn Supercoins for every approved suggestion.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={submit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
@@ -114,7 +124,7 @@ export default function PlaceSuggestionForm({ siteId, lat, lon, onAfterSubmit }:
               <DialogClose asChild>
                 <Button type="button" variant="ghost">Cancel</Button>
               </DialogClose>
-              <Button type="submit" disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</Button>
+              <Button type="submit" disabled={loading}>{loading ? 'Submitting...' : 'Submit for Review'}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
