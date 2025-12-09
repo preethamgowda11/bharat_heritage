@@ -1,15 +1,14 @@
-
 {
   "entities": {
-    "Site": {
+    "HeritageSite": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Site",
+      "title": "HeritageSite",
       "type": "object",
-      "description": "Represents a heritage site with its associated details.",
+      "description": "Represents a heritage site with associated details.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Site entity."
+          "description": "Unique identifier for the heritage site."
         },
         "title": {
           "type": "string",
@@ -25,36 +24,34 @@
         },
         "thumbnailUrl": {
           "type": "string",
-          "description": "URL of the thumbnail image for the site."
+          "description": "URL of the thumbnail image for the heritage site."
         },
         "coverImageUrl": {
           "type": "string",
-          "description": "URL of the cover image for the site."
+          "description": "URL of the cover image for the heritage site."
         },
         "lowPolyModelUrl": {
           "type": "string",
-          "description": "URL of the low-polygon 3D model for the site."
+          "description": "URL of the low-poly 3D model for the heritage site."
         },
         "highPolyModelUrl": {
           "type": "string",
-          "description": "URL of the high-polygon 3D model for the site."
+          "description": "URL of the high-poly 3D model for the heritage site."
         },
         "fallback360Url": {
           "type": "string",
-          "description": "URL of the 360° panorama image for the site (fallback)."
+          "description": "URL of the 360° panorama image for the heritage site."
         },
         "audioNarrationUrl": {
           "type": "string",
-          "description": "URL of the audio narration for the site."
+          "description": "URL of the audio narration for the heritage site."
         }
       },
       "required": [
         "id",
         "title",
         "shortDescription",
-        "longDescription",
-        "thumbnailUrl",
-        "coverImageUrl"
+        "thumbnailUrl"
       ]
     },
     "Artifact": {
@@ -65,11 +62,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Artifact entity."
+          "description": "Unique identifier for the artifact."
         },
         "siteId": {
           "type": "string",
-          "description": "Reference to Site. (Relationship: Site 1:N Artifact)"
+          "description": "Reference to HeritageSite. (Relationship: HeritageSite 1:N Artifact)"
         },
         "title": {
           "type": "string",
@@ -89,7 +86,7 @@
         },
         "fallbackImageUrl": {
           "type": "string",
-          "description": "URL of the fallback image for the artifact."
+          "description": "URL of the fallback image for the artifact (e.g., 360° panorama)."
         },
         "audioNarrationUrl": {
           "type": "string",
@@ -100,7 +97,6 @@
         "id",
         "siteId",
         "title",
-        "description",
         "imageUrl"
       ]
     },
@@ -112,15 +108,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the User entity."
+          "description": "Unique identifier for the user."
         },
         "preferences": {
           "type": "string",
-          "description": "Reference to UserPreferences. (Relationship: User 1:1 UserPreferences)"
+          "description": "Reference to UserPreference. (Relationship: User 1:1 UserPreference)"
         },
-        "favorites": {
+        "favoriteSiteIds": {
           "type": "array",
-          "description": "References to Sites. (Relationship: User N:N Site)",
+          "description": "References to HeritageSite. (Relationship: User 1:N HeritageSite (favorites))",
           "items": {
             "type": "string"
           }
@@ -130,15 +126,15 @@
         "id"
       ]
     },
-    "UserPreferences": {
+    "UserPreference": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "UserPreferences",
+      "title": "UserPreference",
       "type": "object",
-      "description": "Stores user-specific preferences for the application.",
+      "description": "Represents user-specific preferences for the application.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the UserPreferences entity."
+          "description": "Unique identifier for the user preference."
         },
         "accessibilityOn": {
           "type": "boolean",
@@ -150,7 +146,7 @@
         },
         "fontScale": {
           "type": "number",
-          "description": "The font scaling factor for the user interface."
+          "description": "Scaling factor for the font size."
         },
         "highContrast": {
           "type": "boolean",
@@ -162,46 +158,71 @@
         },
         "language": {
           "type": "string",
-          "description": "The user's preferred language."
+          "description": "Preferred language for the application."
         }
       },
       "required": [
         "id"
       ]
+    },
+    "Admin": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Admin",
+      "type": "object",
+      "description": "Represents an administrator user of the application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the admin user."
+        },
+        "userName": {
+          "type": "string",
+          "description": "Admin's username."
+        }
+      },
+      "required": [
+        "id",
+        "userName"
+      ]
     }
   },
   "auth": {
     "providers": [
+      "password",
       "anonymous"
     ]
   },
   "firestore": {
     "structure": [
       {
-        "path": "/sites/{siteId}",
+        "path": "/heritage_sites/{heritageSiteId}",
         "definition": {
-          "entityName": "Site",
+          "entityName": "HeritageSite",
           "schema": {
-            "$ref": "#/backend/entities/Site"
+            "$ref": "#/backend/entities/HeritageSite"
           },
-          "description": "Stores heritage site data. Globally readable.",
+          "description": "Stores details about heritage sites. Publicly readable.",
           "params": [
             {
-              "name": "siteId",
+              "name": "heritageSiteId",
               "description": "Unique identifier for the heritage site."
             }
           ]
         }
       },
       {
-        "path": "/artifacts/{artifactId}",
+        "path": "/heritage_sites/{heritageSiteId}/artifacts/{artifactId}",
         "definition": {
           "entityName": "Artifact",
           "schema": {
             "$ref": "#/backend/entities/Artifact"
           },
-          "description": "Stores artifact data. Globally readable. The 'siteId' field references the associated site.",
+          "description": "Stores artifacts related to heritage sites. Includes denormalized 'siteId' for querying.",
           "params": [
+            {
+              "name": "heritageSiteId",
+              "description": "Unique identifier for the parent heritage site."
+            },
             {
               "name": "artifactId",
               "description": "Unique identifier for the artifact."
@@ -216,36 +237,48 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user data. Access is restricted to the authenticated user.",
+          "description": "Stores user profile information. Access restricted to the authenticated user.",
           "params": [
             {
               "name": "userId",
-              "description": "Unique identifier for the user."
+              "description": "Unique identifier for the user (same as auth.uid)."
             }
           ]
         }
       },
       {
-        "path": "/users/{userId}/preferences/{preferencesId}",
+        "path": "/users/{userId}/preferences",
         "definition": {
-          "entityName": "UserPreferences",
+          "entityName": "UserPreference",
           "schema": {
-            "$ref": "#/backend/entities/UserPreferences"
+            "$ref": "#/backend/entities/UserPreference"
           },
-          "description": "Stores user preferences. Access is restricted to the authenticated user.",
+          "description": "Stores user-specific preferences. Access restricted to the authenticated user.",
           "params": [
             {
               "name": "userId",
-              "description": "Unique identifier for the user."
-            },
+              "description": "Unique identifier for the user (same as auth.uid)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "Admin",
+          "schema": {
+            "$ref": "#/backend/entities/Admin"
+          },
+          "description": "Marks a user as an admin. Existence of a document grants admin privileges.",
+          "params": [
             {
-              "name": "preferencesId",
-              "description": "Unique identifier for the preferences document (should match userId)."
+              "name": "userId",
+              "description": "Unique identifier for the admin user (same as auth.uid)."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to optimize for read operations, ensure security, and maintain data consistency. It leverages path-based ownership for user-specific data and denormalization to avoid complex security rules with `get()` calls. The structure adheres to the principle of homogeneous security posture within collections.\n\n1.  **Sites Collection:** Stores the heritage site data. This collection is globally readable. All documents within `/sites` have the same access requirements (public read access).\n2.  **Artifacts Collection:** Stores artifact data. This collection is globally readable. All documents within `/artifacts` have the same access requirements (public read access). The `siteId` field links artifacts to their respective sites.\n3.  **Users Collection:** Contains user-specific data, including user preferences and favorites. Access is restricted to the authenticated user.\n4.  **User Preferences Subcollection:** Stores the user preferences. This uses a hierarchical path, `/users/{userId}/preferences/{preferencesId}`, for exclusive access to the data by the authorized user.\n\n**Authorization Independence:** The data structure avoids hierarchical authorization dependencies. For example, artifact documents do not require fetching site information to determine access.\n\n**QAPs Support:**\n\n*   **List Operations:** The segregation of data into collections with homogeneous security postures allows for secure list operations. For example, listing sites or artifacts does not require filtering based on authorization.\n\nThis structure facilitates simple and robust security rules by:\n\n*   Using path-based ownership for user data.\n*   Avoiding `get()` calls in security rules by denormalizing data where necessary.\n*   Ensuring that all documents within a collection have the same security requirements."
+    "reasoning": "The Firestore structure is designed to optimize for security, scalability, and ease of querying, following the principles of Authorization Independence, Structural Segregation, and Access Modeling. User data and preferences are stored under `/users/{userId}`. Heritage sites and their artifacts are stored separately to maintain a flat security structure and avoid complex authorization rules. Admin roles are managed via a separate `/roles_admin/{uid}` collection for simple role verification.\n\n**Authorization Independence:**\n*   The structure avoids hierarchical authorization dependencies. For example, artifact access does NOT depend on fetching heritage site data. Security rules can be written without using `get()` calls.\n*   Specifically, artifacts include `siteId` to enable direct queries and avoid needing to traverse the parent site to access artifact data.\n\n**Structural Segregation:**\n*   Heritage sites and artifacts are stored in separate collections, allowing different security rules if needed in the future. Currently, all sites are assumed to be publicly accessible, while access to user-specific data is restricted to the authenticated user.\n\n**Access Modeling:**\n*   User preferences are stored under `/users/{userId}/preferences` to ensure that only the authenticated user can access and modify their own preferences.\n*   Admin roles are managed using the 'Existence over Content' principle, where the mere existence of a document in `/roles_admin/{uid}` grants admin privileges.\n\n**QAPs (Rules are not Filters):**\n*   The separation of collections ensures that listing heritage sites or artifacts does not require filtering based on user roles or permissions. All heritage sites are considered publicly listable. User-specific data is secured via path-based ownership.\n\n**Invariants:**\n*   Timestamps could be added to each document (e.g., `createdAt`, `updatedAt`) and enforced via security rules to maintain data integrity. Ownership is enforced via the path structure for user-specific data (`/users/{userId}`)."
   }
 }

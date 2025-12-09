@@ -1,40 +1,29 @@
-
 /**
- * This ruleset enforces a dual security model for a heritage application.
+ * This ruleset defines the security model for a heritage site application.
  *
  * Core Philosophy:
- * The security model is split into two distinct parts: publicly accessible content
- * and privately owned user data. All heritage sites and artifacts are globally
- * readable to facilitate easy discovery by any user, including anonymous ones.
- * In contrast, all user-specific data, such as profiles and preferences, is
- * strictly private and accessible only by the authenticated owner of that data.
- * Client-side writes to public collections are disabled to ensure data integrity,
- * implying content is managed by a trusted backend service (e.g., using the Admin SDK).
+ * The security model is split into three distinct zones:
+ * 1. Public Content: Heritage sites and their associated artifacts are publicly readable by anyone, including unauthenticated users, to encourage exploration.
+ * 2. Administrative Content: Writes (creation, updates, deletion) to public content are strictly limited to users designated as administrators.
+ * 3. Private User Data: Each user has a private data space for their profile and preferences, which is accessible only by them.
  *
  * Data Structure:
- * The data is organized into three top-level collections:
- * 1. /sites: A public, read-only collection of all heritage sites.
- * 2. /artifacts: A public, read-only collection of all artifacts.
- * 3. /users: A private collection where each document, identified by a user's
- *    UID, contains user-specific data. This collection contains a nested
- *    subcollection for user preferences (/users/{userId}/preferences).
+ * - /heritage_sites/{siteId}: Publicly readable information about historical sites.
+ * - /heritage_sites/{siteId}/artifacts/{artifactId}: Publicly readable artifacts belonging to a site.
+ * - /users/{userId}: Private user profile data, keyed by the user's authentication UID.
+ * - /users/{userId}/preferences/{prefId}: Private user preferences, nested under their profile.
+ * - /roles_admin/{userId}: A separate collection that grants admin privileges. A user is an admin if a document with their UID exists here.
  *
  * Key Security Decisions:
- * - Public Read-Only Content: The `/sites` and `/artifacts` collections are
- *   world-readable but cannot be modified by client applications. This prevents
- *   vandalism and ensures data quality.
- * - Strict User Ownership: All documents and subcollections under `/users/{userId}`
- *   can only be accessed by the user whose UID matches `{userId}`.
- * - User Privacy: Listing the entire `/users` collection is explicitly disallowed
- *   to prevent enumeration of the user base.
- * - Denormalization for Authorization: The rules rely on path-based ownership
- *   (e.g., using `{userId}` from the path) to grant access, which is highly
- *   performant and avoids costly `get()` calls to other documents for
- *   authorization checks.
- * - Structural Segregation: Public content (`sites`, `artifacts`) and private
- *   user data (`users`) are stored in separate top-level collections. This is a
- *   best practice that simplifies rules and makes list operations more secure
- *   and efficient.
+ * - Admin Role Management: Admin roles are managed in the `/roles_admin` collection. Only existing admins can create or delete other admins, preventing privilege escalation. The first admin must be created via the Firebase Console.
+ * - No User Enumeration: Listing the entire `/users` collection is explicitly forbidden to protect user privacy.
+ * - Relational Integrity: On creation, an artifact's internal `siteId` must match its parent `heritageSiteId` in the path. These linkage fields are immutable.
+ *
+ * Denormalization for Authorization:
+ * - Admin roles are checked using a simple `exists()` call on the `/roles_admin` collection. This is a fast, efficient, and highly secure way to manage global roles without needing custom claims or complex lookups.
+ *
+ * Structural Segregation:
+ * - Public data (`heritage_sites`) is stored in a separate top-level collection from private data (`users`). This physical separation creates a strong security boundary, simplifying rules and preventing accidental data leakage in list queries.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -45,103 +34,124 @@ service cloud.firestore {
     // --------------------------------------------------------------------
 
     /**
-     * Checks if a user is authenticated.
+     * Returns true if the user is signed in.
      */
     function isSignedIn() {
       return request.auth != null;
     }
 
     /**
-     * Checks if the currently authenticated user's ID matches the provided userId.
-     * This is the primary function for establishing document ownership.
+     * Returns true if the requesting user's UID matches the provided userId.
+     * Ensures a user can only access their own documents.
      */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
     /**
-     * Checks if the user has an admin custom claim.
+     * Returns true if the requesting user is an administrator.
+     * Admin status is granted by the existence of a document in the /roles_admin collection.
      */
     function isAdmin() {
-      return isSignedIn() && request.auth.token.admin == true;
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
     /**
-     * A robust check for update/delete operations, ensuring the document
-     * exists and the user is the owner. This prevents unauthorized writes
-     * and errors on non-existent documents.
+     * Returns true if the document being operated on already exists.
+     * Used to protect against updating or deleting non-existent documents.
      */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
+    function documentExists() {
+      return resource != null;
     }
 
     // --------------------------------------------------------------------
-    // Public Collections
+    // Public Content Rules
     // --------------------------------------------------------------------
 
     /**
-     * @description Allows public, read-only access to all heritage site data.
-     * @path /sites/{siteId}
-     * @allow An unauthenticated user reading a site document: `(get) /sites/some-site-id`
-     * @deny Any user, authenticated or not, trying to create a site: `(create) /sites/new-site`
-     * @principle Secures public data by making it read-only from the client-side. Content management must be done via a trusted backend (Admin SDK).
+     * @description Publicly readable information about heritage sites.
+     *              Only administrators are allowed to create, update, or delete sites.
+     * @path        /heritage_sites/{heritageSiteId}
+     * @allow       Any user, signed-in or not, can (get) or (list) heritage sites.
+     * @allow       An admin user can (create) a new heritage site.
+     * @deny        A regular signed-in user cannot (delete) a heritage site.
+     * @principle   Public read with role-based writes.
      */
-    match /sites/{siteId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+    match /heritage_sites/{heritageSiteId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && documentExists();
     }
 
     /**
-     * @description Allows public, read-only access to all artifact data.
-     * @path /artifacts/{artifactId}
-     * @allow An anonymous user listing all artifacts: `(list) /artifacts`
-     * @deny An authenticated user trying to delete an artifact: `(delete) /artifacts/some-artifact`
-     * @principle Secures public data by making it read-only from the client-side. Content management must be done via a trusted backend (Admin SDK).
+     * @description Artifacts associated with a specific heritage site.
+     *              Publicly readable, but writable only by administrators.
+     * @path        /heritage_sites/{heritageSiteId}/artifacts/{artifactId}
+     * @allow       Any user, signed-in or not, can (get) or (list) artifacts for a site.
+     * @allow       An admin user can (create) a new artifact with a `siteId` matching the parent `heritageSiteId`.
+     * @deny        An admin user cannot (create) an artifact where the `siteId` in the data does not match the path.
+     * @principle   Public read with role-based writes and relational integrity.
      */
-    match /artifacts/{artifactId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+    match /heritage_sites/{heritageSiteId}/artifacts/{artifactId} {
+      allow get, list: if true;
+      allow create: if isAdmin() && request.resource.data.siteId == heritageSiteId;
+      allow update: if isAdmin() && documentExists() && request.resource.data.siteId == resource.data.siteId;
+      allow delete: if isAdmin() && documentExists();
     }
 
     // --------------------------------------------------------------------
-    // User-Private Collections
+    // User Data Rules
     // --------------------------------------------------------------------
 
     /**
-     * @description Manages user profile documents. Restricts all access to the document owner and prevents user enumeration.
-     * @path /users/{userId}
-     * @allow A signed-in user creating their own user document: `(create) /users/user-abc` where `auth.uid == 'user-abc'`.
-     * @deny A signed-in user trying to read another user's document: `(get) /users/user-xyz` where `auth.uid == 'user-abc'`.
-     * @deny Any user trying to list all users: `(list) /users`.
-     * @principle Enforces a strict data ownership model where users can only access their own document.
+     * @description A user's private profile document.
+     *              Strictly accessible only by the owner of the document.
+     * @path        /users/{userId}
+     * @allow       A signed-in user (auth.uid: 'user123') can (create) their own profile at `/users/user123`.
+     * @deny        A signed-in user (auth.uid: 'user456') cannot (get) the profile at `/users/user123`.
+     * @deny        No user can (list) the `/users` collection, preventing user enumeration.
+     * @principle   Enforces strict data ownership and privacy.
      */
     match /users/{userId} {
       allow get: if isOwner(userId);
       allow list: if false;
       allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+      allow update: if isOwner(userId) && documentExists() && request.resource.data.id == resource.data.id;
+      allow delete: if isOwner(userId) && documentExists();
+    }
 
-      /**
-       * @description Manages a user's preferences document. Access is inherited from the parent user document.
-       * @path /users/{userId}/preferences/{preferencesId}
-       * @allow The owner of the user document updating their preferences: `(update) /users/user-abc/preferences/user-abc` where `auth.uid == 'user-abc'`.
-       * @deny A different user trying to read someone's preferences: `(get) /users/user-xyz/preferences/user-xyz` where `auth.uid == 'user-abc'`.
-       * @principle Restricts access to a user's own data tree using path-based ownership and validates relational integrity.
-       */
-      match /preferences/{preferencesId} {
-        allow get: if isOwner(userId);
-        allow list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.id == preferencesId && preferencesId == userId;
-        allow update: if isOwner(userId) && request.resource.data.id == resource.data.id;
-        allow delete: if isExistingOwner(userId);
-      }
+    /**
+     * @description A user's private application preferences.
+     *              Only the owner of the parent user document can access these.
+     * @path        /users/{userId}/preferences/{prefId}
+     * @allow       A signed-in user (auth.uid: 'user123') can (get), (list), and (update) their own preferences.
+     * @deny        A signed-in user (auth.uid: 'user456') cannot (create) preferences for 'user123'.
+     * @principle   Ownership inherited from parent path.
+     */
+    match /users/{userId}/preferences/{prefId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == prefId;
+      allow update: if isOwner(userId) && documentExists() && request.resource.data.id == resource.data.id;
+      allow delete: if isOwner(userId) && documentExists();
+    }
+
+    // --------------------------------------------------------------------
+    // Admin Role Rules
+    // --------------------------------------------------------------------
+
+    /**
+     * @description Manages administrator roles. The existence of a document grants admin privileges.
+     *              Only existing administrators can view or modify the list of admins.
+     * @path        /roles_admin/{userId}
+     * @allow       An existing admin can (create) a document to grant another user admin rights.
+     * @deny        A non-admin user cannot (create) a document for themselves to become an admin.
+     * @deny        A non-admin user cannot (list) the collection to see who the admins are.
+     * @principle   Role-based access control for administrative functions (self-managed).
+     */
+    match /roles_admin/{userId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && documentExists();
     }
   }
 }
