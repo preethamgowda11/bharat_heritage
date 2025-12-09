@@ -29,7 +29,7 @@ export default function DangerCheckPage() {
     const getCameraPermission = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        setHasCameraSPermission(true);
+        setHasCameraPermission(true);
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
