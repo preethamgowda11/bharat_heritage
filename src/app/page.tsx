@@ -78,12 +78,6 @@ export default function Home() {
                 Heritage Alert
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="bg-background/80 text-foreground">
-              <Link href="/qr-scanner">
-                <QrCode className="mr-2 h-5 w-5" />
-                Scan & Learn
-              </Link>
-            </Button>
           </div>
         </div>
       </div>
