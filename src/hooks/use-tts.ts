@@ -3,7 +3,6 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Language } from '@/types';
-import { generateAudio } from '@/ai/tts-flow';
 import { useToast } from './use-toast';
 
 // Splits text into chunks. A simple split by sentence is often good,
@@ -15,7 +14,6 @@ const splitIntoChunks = (text: string): string[] => {
   const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
   return sentences.map(s => s.trim()).filter(s => s.length > 0);
 };
-
 
 export function useTts() {
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -54,8 +52,19 @@ export function useTts() {
     }
 
     try {
-      const result = await generateAudio({ text: sentence, lang: currentLangRef.current });
-      const audioDataUrl = result.media;
+      // Always call our internal API route
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sentence, lang: currentLangRef.current }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'TTS service failed');
+      }
+
+      const { audioDataUrl } = await response.json();
 
       if (isStoppingRef.current) {
           setIsSpeaking(false);
@@ -80,18 +89,18 @@ export function useTts() {
       audioRef.current.src = audioDataUrl;
       await audioRef.current.play();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('TTS generation failed for sentence:', sentence, error);
-      toast({
+       toast({
         variant: 'destructive',
         title: 'TTS Error',
-        description: 'Could not generate audio for the selected text.',
+        description: error.message || 'Could not generate audio for the selected text.',
       });
       // Try to play the next sentence even if one fails
       playNextSentence();
     }
   }, [toast]);
-
+  
   const speak = useCallback((text: string, lang: Language) => {
       if (isSpeaking) {
         stop();
