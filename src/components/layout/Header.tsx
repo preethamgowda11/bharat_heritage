@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Accessibility, Settings, LogIn, LogOut, User, Gem } from 'lucide-react';
+import { Accessibility, Settings, LogOut, User, Gem } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from './Logo';
 import { AccessibilityPanel } from './AccessibilityPanel';
@@ -59,7 +59,7 @@ export function Header() {
                 <>
                   <div className="flex items-center gap-2 border-r pr-2 mr-2">
                     <Gem className="h-5 w-5 text-yellow-500" />
-                    <span className="font-bold text-sm">150</span>
+                    <span className="font-bold text-sm">0</span>
                   </div>
                   <Button
                     variant="ghost"
