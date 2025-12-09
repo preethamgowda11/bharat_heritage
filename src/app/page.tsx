@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Landmark, Gem, ShieldAlert } from 'lucide-react';
+import { Landmark, Gem, ShieldAlert, ScanLine } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useTranslation } from '@/hooks/use-translation';
 import { useState, useEffect } from 'react';
@@ -71,6 +71,12 @@ export default function Home() {
                 <ShieldAlert className="mr-2 h-5 w-5" />
                 {t('lost_india_title')}
               </Link>
+            </Button>
+            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
+               <a href='/ar-sculptures/sample-addon/viewer.html' target='_blank' rel='noopener noreferrer' className='flex items-center'>
+                <ScanLine className="mr-2 h-5 w-5" />
+                Scan & Learn
+              </a>
             </Button>
             <Button asChild size="lg" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
               <Link href="/danger-check">
