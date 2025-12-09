@@ -1,51 +1,64 @@
+
 'use client';
 
 import { PageHeader } from '@/components/common/PageHeader';
-import { useTranslation } from '@/hooks/use-translation';
-import { getLostSites } from '@/lib/data';
-import { LostSiteCard } from '@/components/lost-india/LostSiteCard';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, Camera, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldAlert } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function HeritageAlertsPage() {
-  const { t } = useTranslation();
-  
-  // Filter for only high-risk sites
-  const highRiskSites = getLostSites().filter(site => site.threat_level === 'red');
-
   return (
     <>
       <PageHeader
         title="Heritage Alerts"
-        description="Critically endangered sites requiring immediate attention."
+        description="Help protect our cultural treasures. Report or scan for potential threats."
       >
-         <Button asChild variant="outline">
+        <Button asChild variant="outline">
           <Link href="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t('back_to_home')}
+            Back to Home
           </Link>
         </Button>
       </PageHeader>
       <main className="container px-4 md:px-8 pb-12">
-        <Alert variant="destructive" className="mb-8">
-            <ShieldAlert className="h-4 w-4" />
-            <AlertTitle>Danger Zone</AlertTitle>
-            <AlertDescription>
-                The following heritage sites have been identified as being at high risk. Your attention and responsible reporting can help in their preservation. The "Run Danger Check" feature (coming soon) will allow you to use your camera to analyze and report specific threats.
-            </AlertDescription>
-        </Alert>
-
-        {highRiskSites.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {highRiskSites.map((site) => (
-                <LostSiteCard key={site.id} site={site} />
-            ))}
-            </div>
-        ) : (
-            <p className="text-center text-muted-foreground">No high-risk sites currently identified.</p>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-6 w-6 text-primary" />
+                Contribute a Report
+              </CardTitle>
+              <CardDescription>
+                Have you noticed a heritage site that seems neglected, damaged, or undocumented? Submit a report to bring it to our attention.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full" disabled>
+                Submit a Report (Coming Soon)
+              </Button>
+            </CardContent>
+          </Card>
+          
+          <Card className="hover:shadow-lg transition-shadow border-primary/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Camera className="h-6 w-6 text-primary" />
+                Scan for Danger
+              </CardTitle>
+              <CardDescription>
+                Use your device's camera to run a real-time analysis on a structure to detect potential dangers like cracks or degradation.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full">
+                <Link href="/danger-check">
+                  Open Camera Scanner
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </>
   );

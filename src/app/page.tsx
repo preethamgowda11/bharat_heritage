@@ -80,9 +80,9 @@ export default function Home() {
               </a>
             </Button>
             <Button asChild size="lg" variant="secondary" className="w-full">
-              <Link href="/danger-check">
+              <Link href="/heritage-alerts">
                 <ShieldAlert className="mr-2 h-5 w-5" />
-                Heritage Alert
+                Heritage Alerts
               </Link>
             </Button>
           </div>
