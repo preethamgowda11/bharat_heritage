@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Accessibility, Settings, LogIn, LogOut } from 'lucide-react';
+import { Accessibility, Settings, LogIn, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from './Logo';
 import { AccessibilityPanel } from './AccessibilityPanel';
@@ -57,23 +57,21 @@ export function Header() {
               user ? (
                 <Button
                   variant="ghost"
-                  size="sm"
+                  size="icon"
                   aria-label="Logout"
                   onClick={handleLogout}
                 >
-                  <LogOut className="h-5 w-5 mr-2" />
-                  Logout
+                  <LogOut className="h-5 w-5" />
                 </Button>
               ) : (
                 <Button
                   asChild
                   variant="ghost"
-                  size="sm"
+                  size="icon"
                   aria-label="Admin Login"
                 >
                   <Link href="/login">
-                    <LogIn className="h-5 w-5 mr-2" />
-                    Admin Login
+                    <User className="h-5 w-5" />
                   </Link>
                 </Button>
               )
