@@ -55,7 +55,7 @@ async function handleAnuvadiniRequest(text: string, lang: string) {
     throw new Error('Invalid audio content in Anuvadini response');
   }
 
-  return `data:audio/wav;base64,${audioBase64}`;
+  return `data:audio/mp3;base64,${audioBase64}`;
 }
 
 
