@@ -178,7 +178,7 @@ export default function ExploreSitesPage() {
             <Input
               type="search"
               placeholder="Search sites by voice or text..."
-              className="w-full pl-10 pr-20" // Adjusted padding for two buttons
+              className="w-full pl-10 pr-20"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
