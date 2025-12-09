@@ -77,8 +77,8 @@ export async function POST(req: NextRequest) {
 
     let audioDataUrl: string;
 
-    if (lang === 'or') {
-      // Use Anuvadini for Odia
+    if (lang === 'or' || lang === 'kn') {
+      // Use Anuvadini for Odia and Kannada as per config
       audioDataUrl = await handleAnuvadiniRequest(text, lang);
     } else {
       // Use Google TTS for other languages
