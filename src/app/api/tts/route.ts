@@ -1,7 +1,43 @@
 
 // src/app/api/tts/route.ts
 import { NextResponse } from 'next/server';
-import { getAudioBase64 } from 'google-tts-api';
+import querystring from 'querystring';
+
+async function fetchTts(text: string, lang: string) {
+    const textParts = text.match(/.{1,200}/g) || [];
+    const audioBuffers: Buffer[] = [];
+
+    for (const part of textParts) {
+        const query = {
+            ie: 'UTF-8',
+            q: part,
+            tl: lang,
+            total: 1,
+            idx: 0,
+            textlen: part.length,
+            client: 'tw-ob',
+        };
+        
+        const url = `https://translate.google.com/translate_tts?${querystring.stringify(query)}`;
+
+        const response = await fetch(url, {
+            headers: {
+                'Referer': 'http://translate.google.com/',
+                'User-Agent': 'stagefright/1.2 (Linux;Android 5.0)',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch TTS audio for part: ${part}`);
+        }
+        
+        const buffer = Buffer.from(await response.arrayBuffer());
+        audioBuffers.push(buffer);
+    }
+    
+    return Buffer.concat(audioBuffers).toString('base64');
+}
+
 
 export async function POST(request: Request) {
   try {
@@ -11,13 +47,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Text and language are required' }, { status: 400 });
     }
 
-    // The library expects 'or-IN' for Odia, not 'or'.
-    const effectiveLang = lang === 'or' ? 'or-IN' : lang;
-
-    const base64Audio = await getAudioBase64(text, {
-      lang: effectiveLang,
-      slow: false,
-    });
+    const base64Audio = await fetchTts(text, lang);
 
     return NextResponse.json({ audioData: base64Audio });
 
