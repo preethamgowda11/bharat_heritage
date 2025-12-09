@@ -1,7 +1,7 @@
 
 // src/components/sites/NearbyPlaces.tsx
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { fetchNearbyPOIs, type POI } from '@/lib/places';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -73,61 +73,88 @@ const LoadingSkeleton = () => (
     </div>
 );
 
+type PoiCategory = 'stays' | 'tourist' | 'offbeat';
 
 export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: NearbyPlacesProps) {
-  const [hotels, setHotels] = useState<POI[]>([]);
-  const [tourist, setTourist] = useState<POI[]>([]);
-  const [offbeat, setOffbeat] = useState<POI[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showAllStays, setShowAllStays] = useState(false);
-  const [showAllTourist, setShowAllTourist] = useState(false);
-  const [showAllOffbeat, setShowAllOffbeat] = useState(false);
+  const [data, setData] = useState<Record<PoiCategory, POI[]>>({
+    stays: [],
+    tourist: [],
+    offbeat: [],
+  });
+  const [loading, setLoading] = useState<Record<PoiCategory, boolean>>({
+    stays: true,
+    tourist: false,
+    offbeat: false,
+  });
+  const [error, setError] = useState<Record<PoiCategory, string | null>>({
+    stays: null,
+    tourist: null,
+    offbeat: null,
+  });
 
-  useEffect(() => {
+  const [showAll, setShowAll] = useState<Record<PoiCategory, boolean>>({
+    stays: false,
+    tourist: false,
+    offbeat: false,
+  });
+
+  const categoryTags: Record<PoiCategory, string[]> = {
+    stays: ['tourism=hotel', 'tourism=guest_house', 'tourism=hostel', 'tourism=apartment'],
+    tourist: ['tourism=attraction', 'tourism=museum', 'historic=yes'],
+    offbeat: ['tourism=viewpoint', 'historic=ruins', 'natural=peak', 'historic=archaeological_site'],
+  };
+
+  const fetchCategoryData = useCallback(async (category: PoiCategory) => {
     if (!lat || !lon) {
-        setLoading(false);
-        return;
-    };
-    let mounted = true;
-    setLoading(true);
+      setLoading(prev => ({...prev, [category]: false}));
+      return;
+    }
 
-    const fetchData = async () => {
-      const allTags = [
-        'tourism=hotel', 'tourism=guest_house', 'tourism=hostel', 'tourism=apartment', // Stays
-        'tourism=attraction', 'tourism=museum', 'historic=yes', // Tourist
-        'tourism=viewpoint', 'historic=ruins', 'natural=peak', 'historic=archaeological_site' // Offbeat
-      ];
-      
-      const allPois = await fetchNearbyPOIs(lat, lon, radius, allTags);
+    setLoading(prev => ({...prev, [category]: true}));
+    setError(prev => ({...prev, [category]: null}));
 
-      if (mounted) {
-        const hotelTags = new Set(['hotel', 'guest_house', 'hostel', 'apartment']);
-        const touristTags = new Set(['attraction', 'museum']);
-        const offbeatTags = new Set(['viewpoint', 'ruins', 'peak', 'archaeological_site']);
+    try {
+      const pois = await fetchNearbyPOIs(lat, lon, radius, categoryTags[category]);
+      setData(prev => ({...prev, [category]: pois}));
+    } catch (e: any) {
+      setError(prev => ({...prev, [category]: e.message || `Failed to fetch ${category}.`}));
+    } finally {
+      setLoading(prev => ({...prev, [category]: false}));
+    }
+  }, [lat, lon, radius, categoryTags]);
 
-        const staysData = allPois.filter(p => hotelTags.has(p.tags.tourism));
-        const touristData = allPois.filter(p => touristTags.has(p.tags.tourism) || p.tags.historic === 'yes');
-        const offbeatData = allPois.filter(p => offbeatTags.has(p.tags.tourism) || offbeatTags.has(p.tags.historic) || offbeatTags.has(p.tags.natural));
+  // Fetch initial data for the default tab ('stays')
+  useEffect(() => {
+    fetchCategoryData('stays');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchCategoryData]);
 
-        setHotels(staysData);
-        setTourist(touristData);
-        setOffbeat(offbeatData);
 
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-    return () => { mounted = false; };
-  }, [lat, lon, radius]);
-
+  const handleTabChange = (value: string) => {
+    const category = value as PoiCategory;
+    // Fetch data only if it hasn't been fetched before
+    if (data[category].length === 0 && !error[category]) {
+      fetchCategoryData(category);
+    }
+  };
+  
   const renderPoiList = (
     pois: POI[], 
-    showAll: boolean, 
-    toggleShowAll: () => void, 
-    type: string
+    category: PoiCategory
     ) => {
-    const visiblePois = showAll ? pois : pois.slice(0, INITIAL_DISPLAY_COUNT);
+
+    const visiblePois = showAll[category] ? pois : pois.slice(0, INITIAL_DISPLAY_COUNT);
+
+    if (loading[category]) {
+      return <LoadingSkeleton />;
+    }
+    if (error[category]) {
+      return <p className="text-center text-destructive mt-8">{error[category]}</p>;
+    }
+    if (pois.length === 0) {
+      return <p className="text-center text-muted-foreground mt-8">No nearby {category.replace('_', ' ')} found within {radius / 1000}km.</p>;
+    }
+
     return (
         <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -135,8 +162,8 @@ export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: Nearby
             </div>
             {pois.length > INITIAL_DISPLAY_COUNT && (
                 <div className="text-center mt-6">
-                    <Button variant="outline" onClick={toggleShowAll}>
-                        {showAll ? `See Less ${type}` : `See All ${pois.length} ${type}`}
+                    <Button variant="outline" onClick={() => setShowAll(prev => ({...prev, [category]: !prev[category]}))}>
+                        {showAll[category] ? `See Less` : `See All ${pois.length} places`}
                     </Button>
                 </div>
             )}
@@ -152,34 +179,23 @@ export default function NearbyPlaces({ siteId, lat, lon, radius = 5000 }: Nearby
             <h2 className="text-3xl font-headline">Nearby Stays & Places</h2>
             <PlaceSuggestionForm siteId={siteId} lat={lat} lon={lon} />
         </div>
-        <Tabs defaultValue="stays" className="w-full">
+        <Tabs defaultValue="stays" className="w-full" onValueChange={handleTabChange}>
             <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3">
                 <TabsTrigger value="stays">Stays</TabsTrigger>
                 <TabsTrigger value="offbeat">Offbeat Places</TabsTrigger>
                 <TabsTrigger value="tourist">Tourist Spots</TabsTrigger>
             </TabsList>
             <TabsContent value="stays">
-                {loading ? <LoadingSkeleton /> : (
-                    hotels.length > 0 ? (
-                        renderPoiList(hotels, showAllStays, () => setShowAllStays(prev => !prev), 'stays')
-                    ) : <p className="text-center text-muted-foreground mt-8">No nearby stays found within {radius / 1000}km.</p>
-                )}
+              {renderPoiList(data.stays, 'stays')}
             </TabsContent>
             <TabsContent value="offbeat">
-                {loading ? <LoadingSkeleton /> : (
-                    offbeat.length > 0 ? (
-                        renderPoiList(offbeat, showAllOffbeat, () => setShowAllOffbeat(prev => !prev), 'places')
-                    ) : <p className="text-center text-muted-foreground mt-8">No offbeat places found within {radius / 1000}km.</p>
-                )}
+              {renderPoiList(data.offbeat, 'offbeat')}
             </TabsContent>
             <TabsContent value="tourist">
-                {loading ? <LoadingSkeleton /> : (
-                    tourist.length > 0 ? (
-                        renderPoiList(tourist, showAllTourist, () => setShowAllTourist(prev => !prev), 'spots')
-                    ) : <p className="text-center text-muted-foreground mt-8">No nearby tourist spots found within {radius / 1000}km.</p>
-                )}
+              {renderPoiList(data.tourist, 'tourist')}
             </TabsContent>
         </Tabs>
     </section>
   );
 }
+
