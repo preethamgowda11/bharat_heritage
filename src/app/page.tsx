@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Landmark, Gem, QrCode, ShieldAlert } from 'lucide-react';
+import { Landmark, Gem, ShieldAlert } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useTranslation } from '@/hooks/use-translation';
 import { useState, useEffect } from 'react';
@@ -80,11 +80,6 @@ export default function Home() {
             </Button>
           </div>
         </div>
-      </div>
-      <div className='mt-6 flex justify-center'>
-        <a href='/ar-sculptures/sample-addon/viewer.html' target='_blank' rel='noopener noreferrer' className='inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition'>
-          Scan &amp; Learn
-        </a>
       </div>
     </>
   );
